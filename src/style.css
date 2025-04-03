@@ -74,20 +74,28 @@ body {
 
 /* Toolbar Section */
 .toolbar {
+    background-color: var(--surface);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
 }
 
 .input-section {
     display: flex;
     gap: var(--spacing-xl);
+    flex-wrap: wrap;
 }
 
 .input-group {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs);
+    min-width: 140px;
 }
 
 .input-group label {
@@ -110,6 +118,7 @@ body {
     display: flex;
     align-items: center;
     gap: var(--spacing-lg);
+    flex-wrap: wrap;
 }
 
 /* Toggle Switch */
@@ -382,4 +391,91 @@ h1 {
 .signature {
     height: 24px;
     width: auto;
+}
+
+@media screen and (max-width: 768px) {
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-lg);
+    }
+
+    .input-section {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .input-group {
+        width: 100%;
+    }
+
+    .input-group input {
+        width: 100%;
+    }
+
+    .controls-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-md);
+    }
+
+    .toggle {
+        justify-content: space-between;
+    }
+
+    .save-button {
+        width: 100%;
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    body {
+        padding: var(--spacing-xs);
+    }
+
+    .app-container {
+        gap: var(--spacing-sm);
+    }
+
+    /* Scale down the export frame container while maintaining aspect ratio */
+    .export-frame-container {
+        width: 100vw;
+        margin-left: calc(-1 * var(--spacing-xs));
+        margin-right: calc(-1 * var(--spacing-xs));
+    }
+
+    .export-frame {
+        transform-origin: top center;
+        transform: scale(calc(100vw / 1080));
+        margin-bottom: calc(-1920px + (1920px * (100vw / 1080)));
+    }
+
+    /* Adjust title size for mobile */
+    h1 {
+        font-size: 48px;
+        line-height: 48px;
+    }
+
+    /* Adjust footer for mobile */
+    .tagline {
+        font-size: 36px;
+    }
+
+    .credits {
+        font-size: 12px;
+    }
+
+    .signature {
+        height: 20px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    h1 {
+        font-size: 36px;
+        line-height: 36px;
+    }
+
+    .tagline {
+        font-size: 28px;
+    }
 }
