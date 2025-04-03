@@ -18,7 +18,6 @@
     "nanoid": "^3.3.11",
     "picocolors": "^1.1.1",
     "postcss": "^8.5.3",
-    "rollup": "^4.39.0",
     "source-map-js": "^1.2.1",
     "tippy.js": "^6.3.7"
   },
