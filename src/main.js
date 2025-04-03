@@ -8,6 +8,7 @@ import html2canvas from 'html2canvas';
 const WEEKS_IN_YEAR = 52;
 const EXPORT_WIDTH = 1080;
 const EXPORT_HEIGHT = 1920;
+const EXPORT_PADDING = 48; // var(--spacing-xxl)
 
 /**
  * Configuration for different life phases
@@ -190,6 +191,8 @@ function createWeekElement(weekIndex, weeksPassed, birthDate) {
  * @param {Date} birthDate - The user's birth date
  */
 function renderGrid(weeksPassed, totalWeeks, birthDate) {
+    const lifespan = totalWeeks / WEEKS_IN_YEAR;
+    
     // Clear previous grid and tooltips
     elements.weeksGrid.innerHTML = '';
     if (elements.weeksGrid._tippyInstances) {
@@ -296,10 +299,18 @@ async function exportImage() {
  * Updates the grid when any input changes
  */
 function updateGrid() {
+    console.log('Updating grid...');
     const birthDate = new Date(elements.birthdateInput.value);
     const lifespan = parseInt(elements.lifespanInput.value);
     const totalWeeks = lifespan * WEEKS_IN_YEAR;
     const weeksPassed = calculateWeeksPassed(birthDate, new Date());
+    
+    console.log('Grid parameters:', {
+        birthDate,
+        lifespan,
+        totalWeeks,
+        weeksPassed
+    });
     
     renderGrid(weeksPassed, totalWeeks, birthDate);
 }
@@ -312,4 +323,6 @@ elements.showPhasesToggle.addEventListener('change', updateGrid);
 elements.saveButton.addEventListener('click', exportImage);
 
 // Initial render
+console.log('Starting initial render...');
+console.log('DOM Elements:', elements);
 updateGrid();

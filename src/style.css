@@ -23,11 +23,11 @@
     --border: #e0e0e0;
 
     /* Phase Colors */
-    --phase-childhood: rgb(255, 241, 89);
-    --phase-adolescence: rgb(255, 140, 89);
-    --phase-early-adulthood: rgb(89, 203, 255);
-    --phase-middle-age: rgb(89, 255, 160);
-    --phase-late-adulthood: rgb(206, 89, 255);
+    --phase-childhood: 255, 190, 157;    /* Soft peach */
+    --phase-adolescence: 255, 166, 158;  /* Light coral */
+    --phase-early-adulthood: 160, 217, 255;  /* Soft blue */
+    --phase-middle-age: 173, 255, 201;   /* Soft mint */
+    --phase-late-adulthood: 220, 189, 251;  /* Soft lavender */
 
     /* Typography */
     --heading-font: 'AmsiPro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -143,7 +143,7 @@ body {
 }
 
 .toggle input[type="checkbox"]:checked {
-    background-color: var(--primary-color);
+    background-color: var(--accent-blue);
 }
 
 .toggle input[type="checkbox"]:checked::before {
@@ -160,7 +160,7 @@ body {
     background-color: var(--accent-blue);
     color: var(--surface);
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: 50px;
     padding: 10px var(--spacing-md);
     font-size: 14px;
     font-weight: 600;
@@ -207,6 +207,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    gap: var(--spacing-xs);
 }
 
 /* Title */
@@ -214,9 +215,10 @@ h1 {
     font-family: var(--heading-font);
     color: var(--text-primary);
     font-size: 64px;
+    line-height: 64px;
     text-align: center;
-    margin-bottom: var(--spacing-sm);
     flex-shrink: 0;
+    margin-bottom: var(--spacing-sm);
 }
 
 /* Grid Container */
@@ -225,40 +227,51 @@ h1 {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    overflow: hidden;
 }
 
 .phases-and-grid {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-lg);
+    gap: 4px;
     min-height: 0;
 }
 
 .weeks-container {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
+    display: grid;
+    grid-template-rows: repeat(auto-fit, min-content);
+    gap: 4px;
     min-height: 0;
 }
 
 /* Week Styles */
+.phase-weeks {
+    display: grid;
+    grid-template-columns: repeat(52, 1fr);
+    gap: 1px;
+}
+
 .week {
-    aspect-ratio: 1.12/1;
+    width: 100%;
+    height: 16px;
     background-color: rgba(255, 140, 89, 0.2);
     transition: background-color 0.2s ease;
-    border: none;
-    -webkit-appearance: none;
 }
 
 .week.past {
-    background-color: rgba(255, 140, 89, 1);
+    background-color: var(--primary-color);
 }
 
 /* Event Styles */
 .week.event {
     position: relative;
+    background-color: rgba(0, 163, 255, 0.2) !important; /* Using accent blue */
+}
+
+.week.event.past {
+    background-color: var(--accent-blue) !important;
 }
 
 .week.event::after {
@@ -267,9 +280,9 @@ h1 {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 4px;
-    height: 4px;
-    background-color: var(--accent-blue);
+    width: 6px;
+    height: 6px;
+    background-color: #ffffff;
     border-radius: 50%;
 }
 
@@ -333,7 +346,7 @@ h1 {
 .phase-name {
     font-family: var(--heading-font);
     color: var(--text-primary);
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 900;
 }
 
@@ -342,24 +355,19 @@ h1 {
     font-size: 14px;
 }
 
-.phase-weeks {
-    display: grid;
-    grid-template-columns: repeat(52, 1fr);
-    gap: 1px;
-}
-
 /* Footer */
 .export-footer {
     margin-top: auto;
     padding-top: var(--spacing-sml);
     flex-shrink: 0;
+    height: 96px;
 }
 
 .tagline {
     font-family: var(--heading-font);
     color: var(--primary-color);
     font-size: 48px;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom:0;
     text-align: center;
 }
 
