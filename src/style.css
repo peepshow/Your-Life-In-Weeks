@@ -1,3 +1,12 @@
+/* Custom Font */
+@font-face {
+    font-family: 'AmsiPro';
+    src: url('/Your-Life-In-Weeks/fonts/AmsiProNarw-Black.woff2') format('woff2');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* Basic Reset & Body Styling */
 * {
     margin: 0;
@@ -17,6 +26,7 @@
     --background: #f8f9fa;
     --surface: #ffffff;
     --border: #e0e0e0;
+    --heading-font: 'AmsiPro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 body {
@@ -48,6 +58,7 @@ h1 {
     text-align: center;
     position: relative;
     padding-bottom: 20px;
+    font-family: var(--heading-font);
 }
 
 h1::after {
@@ -204,9 +215,10 @@ h1::after {
 }
 
 .phase-name {
-    font-weight: 500;
+    font-family: var(--heading-font);
+    font-size: 1rem;
     color: var(--text-primary);
-    font-size: 0.875rem;
+    font-weight: 500;
 }
 
 .phase-duration {
