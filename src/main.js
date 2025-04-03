@@ -56,6 +56,19 @@ tippy.setDefaultProps({
     placement: 'top',
     duration: [200, 150],
     delay: [100, 0],
+    touch: ['hold', 500], // Hold for 500ms on touch devices
+    maxWidth: 300,
+    interactive: true,
+    appendTo: () => document.body, // Ensures tooltips are always visible
+    popperOptions: {
+        modifiers: [{
+            name: 'preventOverflow',
+            options: {
+                altAxis: true,
+                padding: 10
+            }
+        }]
+    }
 });
 
 // --- Helper Functions ---
@@ -175,8 +188,17 @@ function createWeekElement(weekIndex, weeksPassed, birthDate) {
             tippy(weekElement, {
                 content: eventDetails,
                 allowHTML: true,
-                maxWidth: 300,
-                interactive: true
+                maxWidth: window.innerWidth < 768 ? 250 : 300,
+                interactive: true,
+                onShow(instance) {
+                    // Ensure tooltip is positioned within viewport
+                    const rect = instance.reference.getBoundingClientRect();
+                    if (window.innerWidth < 768) {
+                        instance.setProps({
+                            placement: rect.top < window.innerHeight / 2 ? 'bottom' : 'top'
+                        });
+                    }
+                }
             });
         }
     }

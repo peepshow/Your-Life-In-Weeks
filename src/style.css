@@ -293,6 +293,70 @@ h1 {
     height: 6px;
     background-color: #ffffff;
     border-radius: 50%;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile Tooltip Styles */
+@media (max-width: 768px) {
+    .week.event::after {
+        width: 8px;
+        height: 8px;
+    }
+
+    /* Increase tap target size */
+    .week.event::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 24px;
+        height: 24px;
+        background: transparent;
+        z-index: 1;
+    }
+}
+
+/* Tooltip Theme */
+.tippy-box[data-theme~='custom'] {
+    background-color: var(--surface);
+    color: var(--text-primary);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: var(--spacing-xs);
+}
+
+.tippy-box[data-theme~='custom'] .tippy-arrow {
+    color: var(--surface);
+}
+
+.event-tooltip {
+    padding: var(--spacing-xs);
+}
+
+.event-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.event-date {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .event-tooltip {
+        padding: var(--spacing-sm);
+    }
+
+    .event-title {
+        font-size: 16px;
+        margin-bottom: 6px;
+    }
+
+    .event-date {
+        font-size: 14px;
+    }
 }
 
 /* Phase Styles */
