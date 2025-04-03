@@ -6,33 +6,54 @@
     <title>Life in Weeks</title>
   </head>
   <body>
-    <div class="container">
-      <h1>Your Life in Weeks</h1>
-
-      <div class="input-section">
-        <div class="input-group">
-          <label for="birthdate">Date of Birth:</label>
-          <input type="date" id="birthdate">
+    <div class="app-container">
+      <!-- Toolbar section -->
+      <div class="toolbar">
+        <div class="input-section">
+          <div class="input-group">
+            <label for="birthdate">DATE OF BIRTH:</label>
+            <input type="date" id="birthdate" value="1982-11-20">
+          </div>
+          <div class="input-group">
+            <label for="lifespan">LIFESPAN (YEARS):</label>
+            <input type="number" id="lifespan" min="1" max="120" value="90">
+          </div>
         </div>
-        <div class="input-group">
-          <label for="lifespan">Lifespan (years):</label>
-          <input type="number" id="lifespan" min="1" max="120" value="90">
+
+        <div class="controls-section">
+          <label class="toggle">
+            <input type="checkbox" id="showEvents">
+            <span class="toggle-label">Show Historical Events</span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="showPhases">
+            <span class="toggle-label">Show Life Phases</span>
+          </label>
+          <button id="saveButton" class="save-button">SAVE A COPY</button>
         </div>
       </div>
 
-      <div class="controls-section">
-        <label class="toggle">
-          <input type="checkbox" id="showEvents">
-          <span class="toggle-label">Show Historical Events</span>
-        </label>
-        <label class="toggle">
-          <input type="checkbox" id="showPhases">
-          <span class="toggle-label">Show Life Phases</span>
-        </label>
-      </div>
+      <!-- Export frame container -->
+      <div class="export-frame-container">
+        <!-- Export frame -->
+        <div id="exportFrame" class="export-frame">
+          <div class="content-wrapper">
+            <h1>My Life in Weeks</h1>
+            
+            <!-- Grid container for weeks -->
+            <div class="grid-container" id="weeksGrid"></div>
 
-      <div class="grid-container" id="weeksGrid">
-        <!-- Weeks will be generated here by JavaScript -->
+            <!-- Footer -->
+            <div class="export-footer">
+              <div class="tagline">Make it Count</div>
+              <div class="credits">
+                <span>@bennemtin</span>
+                <img src="./signature.svg" alt="Ben Nemtin" class="signature">
+                <span>April 2025</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

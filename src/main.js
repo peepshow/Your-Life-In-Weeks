@@ -1,21 +1,30 @@
 import './style.css'
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
+import html2canvas from 'html2canvas';
 // import 'tippy.js/themes/light.css'; // We are using a custom theme
 
 // --- Constants ---
 const WEEKS_IN_YEAR = 52;
+const EXPORT_WIDTH = 1080;
+const EXPORT_HEIGHT = 1920;
 
-// Life Phases Configuration
+/**
+ * Configuration for different life phases
+ * @type {Array<{name: string, startAge: number, endAge: number, className: string}>}
+ */
 const lifePhases = [
-    { name: 'Childhood', startAge: 0, endAge: 13, className: 'phase-childhood' },
-    { name: 'Adolescence', startAge: 13, endAge: 20, className: 'phase-adolescence' },
-    { name: 'Early Adulthood', startAge: 20, endAge: 40, className: 'phase-early-adulthood' },
-    { name: 'Middle Age', startAge: 40, endAge: 65, className: 'phase-middle-age' },
-    { name: 'Late Adulthood', startAge: 65, endAge: Infinity, className: 'phase-late-adulthood' },
+    { name: 'Childhood', startAge: 0, endAge: 13, className: 'childhood' },
+    { name: 'Adolescence', startAge: 13, endAge: 20, className: 'adolescence' },
+    { name: 'Early Adulthood', startAge: 20, endAge: 40, className: 'early-adulthood' },
+    { name: 'Middle Age', startAge: 40, endAge: 65, className: 'middle-age' },
+    { name: 'Late Adulthood', startAge: 65, endAge: Infinity, className: 'late-adulthood' }
 ];
 
-// Historical Events Dataset
+/**
+ * Dataset of significant historical events
+ * @type {Array<{date: string, title: string}>}
+ */
 const historicalEvents = [
     { date: '1969-07-20', title: 'Moon Landing' },
     { date: '1989-11-09', title: 'Fall of Berlin Wall' },
@@ -28,11 +37,15 @@ const historicalEvents = [
 ];
 
 // --- DOM Elements ---
-const birthdateInput = document.getElementById('birthdate');
-const lifespanInput = document.getElementById('lifespan');
-const showEventsToggle = document.getElementById('showEvents');
-const showPhasesToggle = document.getElementById('showPhases');
-const weeksGrid = document.getElementById('weeksGrid');
+const elements = {
+    birthdateInput: document.getElementById('birthdate'),
+    lifespanInput: document.getElementById('lifespan'),
+    showEventsToggle: document.getElementById('showEvents'),
+    showPhasesToggle: document.getElementById('showPhases'),
+    weeksGrid: document.getElementById('weeksGrid'),
+    saveButton: document.getElementById('saveButton'),
+    exportFrame: document.getElementById('exportFrame')
+};
 
 // Configure default Tippy options
 tippy.setDefaultProps({
@@ -44,192 +57,259 @@ tippy.setDefaultProps({
     delay: [100, 0],
 });
 
-// --- Functions ---
+// --- Helper Functions ---
 
 /**
- * Calculates the number of weeks between two dates.
- * @param {Date} startDate - The start date.
- * @param {Date} endDate - The end date.
- * @returns {number} The total number of weeks elapsed.
+ * Calculates the number of weeks between two dates
+ * @param {Date} startDate - The start date
+ * @param {Date} endDate - The end date
+ * @returns {number} The number of weeks elapsed
  */
 function calculateWeeksPassed(startDate, endDate) {
     const msInWeek = 1000 * 60 * 60 * 24 * 7;
-    const diffInMs = endDate.getTime() - startDate.getTime();
-    return Math.floor(diffInMs / msInWeek);
+    return Math.floor((endDate.getTime() - startDate.getTime()) / msInWeek);
 }
 
 /**
- * Finds events that occurred during a specific week.
- * @param {Date} weekDate - The date of the week to check.
- * @returns {Array} Array of events that occurred during that week.
+ * Finds events that occurred during a specific week
+ * @param {Date} weekDate - The date of the week to check
+ * @returns {Array} Array of events that occurred during that week
  */
 function findEventsForWeek(weekDate) {
+    const weekStart = new Date(weekDate);
+    const weekEnd = new Date(weekDate);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+    
     return historicalEvents.filter(event => {
         const eventDate = new Date(event.date);
-        const weekStart = new Date(weekDate);
-        const weekEnd = new Date(weekDate);
-        weekEnd.setDate(weekEnd.getDate() + 7);
-        
         return eventDate >= weekStart && eventDate < weekEnd;
     });
 }
 
 /**
- * Renders the life weeks grid.
- * @param {number} weeksPassed - The number of weeks that have passed.
- * @param {number} totalWeeks - The total number of weeks in the lifespan.
- * @param {Date} birthDate - The user's birth date.
+ * Creates a phase separator element
+ * @param {Object} phase - The phase object containing name and age range
+ * @returns {HTMLElement} The phase separator element
  */
-function renderGrid(weeksPassed, totalWeeks, birthDate) {
-    // Clear previous grid and tooltips
-    weeksGrid.innerHTML = '';
-    const existingTippys = weeksGrid._tippyInstances;
-    if (existingTippys) {
-        existingTippys.forEach(instance => instance.destroy());
-    }
-
-    let currentPhaseIndex = -1;
-
-    // Create a container for the phases and grid
-    const gridContainer = document.createElement('div');
-    gridContainer.className = 'phases-and-grid';
-
-    // Create the weeks container
-    const weeksContainer = document.createElement('div');
-    weeksContainer.className = 'weeks-container';
-
-    for (let i = 0; i < totalWeeks; i++) {
-        const weekElement = document.createElement('div');
-        weekElement.classList.add('week');
-
-        // Calculate age for the current week
-        const ageInYears = i / WEEKS_IN_YEAR;
-
-        // Check for phase change and add separator if phases are shown
-        if (showPhasesToggle.checked) {
-            const phaseIndex = lifePhases.findIndex(phase => 
-                ageInYears >= phase.startAge && ageInYears < phase.endAge
-            );
-
-            if (phaseIndex !== currentPhaseIndex) {
-                currentPhaseIndex = phaseIndex;
-                const phase = lifePhases[phaseIndex];
-                
-                if (phase) {
-                    // Create phase separator
-                    const phaseSeparator = document.createElement('div');
-                    phaseSeparator.className = 'phase-separator';
-                    
-                    // Calculate phase duration
-                    const duration = phase.endAge === Infinity 
-                        ? `${phase.startAge}+ years`
-                        : `${phase.startAge}-${phase.endAge} years`;
-
-                    phaseSeparator.innerHTML = `
-                        <div class="phase-info">
-                            <span class="phase-name">${phase.name}</span>
-                            <span class="phase-duration">${duration}</span>
-                        </div>
-                    `;
-                    weeksContainer.appendChild(phaseSeparator);
-                }
-            }
-
-            // Apply phase class
-            const currentPhase = lifePhases[currentPhaseIndex];
-            if (currentPhase) {
-                weekElement.classList.add(currentPhase.className);
-            }
-        }
-
-        if (i < weeksPassed) {
-            weekElement.classList.add('past');
-        }
-
-        // Calculate the date for this week (used for events)
-        const weekDate = new Date(birthDate);
-        weekDate.setDate(weekDate.getDate() + (i * 7));
-
-        // Add event markers if enabled
-        if (showEventsToggle.checked) {
-            const events = findEventsForWeek(weekDate);
-            if (events.length > 0) {
-                weekElement.classList.add('event');
-                const eventDetails = events.map(e => {
-                    const eventDate = new Date(e.date);
-                    const formattedDate = eventDate.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    return `<div class="event-tooltip">
-                        <div class="event-title">${e.title}</div>
-                        <div class="event-date">${formattedDate}</div>
-                    </div>`;
-                }).join('');
-                
-                tippy(weekElement, {
-                    content: eventDetails,
-                    allowHTML: true,
-                    maxWidth: 300,
-                    interactive: true,
-                });
-            }
-        }
-
-        weeksContainer.appendChild(weekElement);
-    }
-
-    // Add the weeks container to the main container
-    gridContainer.appendChild(weeksContainer);
+function createPhaseSeparator(phase) {
+    const phaseSeparator = document.createElement('div');
+    phaseSeparator.className = 'phase-separator';
     
-    // Replace the old grid with the new container
-    weeksGrid.appendChild(gridContainer);
+    const duration = phase.endAge === Infinity 
+        ? `${phase.startAge}+ years`
+        : `${phase.startAge}-${phase.endAge} years`;
+
+    phaseSeparator.innerHTML = `
+        <div class="phase-info">
+            <span class="phase-name">${phase.name}</span>
+            <span class="phase-duration">${duration}</span>
+        </div>
+    `;
+    
+    return phaseSeparator;
 }
 
 /**
- * Updates the visualization based on current input values.
+ * Creates a container for phase weeks
+ * @param {Array<HTMLElement>} weeks - Array of week elements
+ * @returns {HTMLElement} The phase weeks container
  */
-function updateVisualization() {
-    const birthdateString = birthdateInput.value;
-    if (!birthdateString) {
-        weeksGrid.innerHTML = '';
-        return;
+function createPhaseWeeksContainer(weeks) {
+    const container = document.createElement('div');
+    container.className = 'phase-weeks';
+    weeks.forEach(week => container.appendChild(week));
+    return container;
+}
+
+/**
+ * Creates a week element with appropriate classes and event handlers
+ * @param {number} weekIndex - The index of the week
+ * @param {number} weeksPassed - Number of weeks that have passed
+ * @param {Date} birthDate - The user's birth date
+ * @returns {HTMLElement} The week element
+ */
+function createWeekElement(weekIndex, weeksPassed, birthDate) {
+    const weekElement = document.createElement('div');
+    weekElement.classList.add('week');
+
+    const ageInYears = weekIndex / WEEKS_IN_YEAR;
+
+    // Add phase class if enabled
+    if (elements.showPhasesToggle.checked) {
+        const phaseIndex = lifePhases.findIndex(phase => 
+            ageInYears >= phase.startAge && ageInYears < phase.endAge
+        );
+        
+        if (phaseIndex !== -1) {
+            weekElement.classList.add(lifePhases[phaseIndex].className);
+        }
     }
 
+    // Mark as past if applicable
+    if (weekIndex < weeksPassed) {
+        weekElement.classList.add('past');
+    }
+
+    // Add event marker if enabled
+    if (elements.showEventsToggle.checked) {
+        const weekDate = new Date(birthDate);
+        weekDate.setDate(weekDate.getDate() + (weekIndex * 7));
+        
+        const events = findEventsForWeek(weekDate);
+        if (events.length > 0) {
+            weekElement.classList.add('event');
+            const eventDetails = events.map(e => {
+                const eventDate = new Date(e.date);
+                const formattedDate = eventDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                return `<div class="event-tooltip">
+                    <div class="event-title">${e.title}</div>
+                    <div class="event-date">${formattedDate}</div>
+                </div>`;
+            }).join('');
+            
+            tippy(weekElement, {
+                content: eventDetails,
+                allowHTML: true,
+                maxWidth: 300,
+                interactive: true
+            });
+        }
+    }
+
+    return weekElement;
+}
+
+/**
+ * Renders the life weeks grid
+ * @param {number} weeksPassed - Number of weeks that have passed
+ * @param {number} totalWeeks - Total number of weeks in the lifespan
+ * @param {Date} birthDate - The user's birth date
+ */
+function renderGrid(weeksPassed, totalWeeks, birthDate) {
+    // Clear previous grid and tooltips
+    elements.weeksGrid.innerHTML = '';
+    if (elements.weeksGrid._tippyInstances) {
+        elements.weeksGrid._tippyInstances.forEach(instance => instance.destroy());
+    }
+
+    // Create containers
+    const phasesAndGrid = document.createElement('div');
+    phasesAndGrid.className = 'phases-and-grid';
+
+    const weeksContainer = document.createElement('div');
+    weeksContainer.className = 'weeks-container';
+
+    let currentPhaseIndex = -1;
+    let currentPhaseWeeks = [];
+
+    // Create and add week elements
+    for (let i = 0; i < totalWeeks; i++) {
+        const weekElement = createWeekElement(i, weeksPassed, birthDate);
+        
+        if (elements.showPhasesToggle.checked) {
+            const ageInYears = i / WEEKS_IN_YEAR;
+            const phaseIndex = lifePhases.findIndex(phase => 
+                ageInYears >= phase.startAge && ageInYears < phase.endAge
+            );
+            
+            if (phaseIndex !== -1 && phaseIndex !== currentPhaseIndex) {
+                // Add previous phase's weeks
+                if (currentPhaseWeeks.length > 0) {
+                    weeksContainer.appendChild(createPhaseWeeksContainer(currentPhaseWeeks));
+                    currentPhaseWeeks = [];
+                }
+
+                // Add new phase separator
+                currentPhaseIndex = phaseIndex;
+                weeksContainer.appendChild(createPhaseSeparator(lifePhases[phaseIndex]));
+            }
+        }
+
+        currentPhaseWeeks.push(weekElement);
+    }
+
+    // Add any remaining weeks
+    if (currentPhaseWeeks.length > 0) {
+        weeksContainer.appendChild(createPhaseWeeksContainer(currentPhaseWeeks));
+    }
+
+    // Assemble and add to DOM
+    phasesAndGrid.appendChild(weeksContainer);
+    elements.weeksGrid.appendChild(phasesAndGrid);
+}
+
+/**
+ * Exports the visualization as an image
+ * @returns {Promise<void>}
+ */
+async function exportImage() {
     try {
-        const birthDate = new Date(birthdateString);
-        const today = new Date();
-        const lifespan = parseInt(lifespanInput.value) || 90;
-        const totalWeeks = lifespan * WEEKS_IN_YEAR;
+        // Show loading state
+        const originalText = elements.saveButton.textContent;
+        elements.saveButton.textContent = 'Exporting...';
+        elements.saveButton.disabled = true;
 
-        // Basic validation
-        if (birthDate > today) {
-            alert("Birth date cannot be in the future.");
-            weeksGrid.innerHTML = '';
-            birthdateInput.value = '';
-            return;
-        }
+        // Capture the export frame
+        const canvas = await html2canvas(elements.exportFrame, {
+            width: EXPORT_WIDTH,
+            height: EXPORT_HEIGHT,
+            scale: 2, // Render at 2x for better quality
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+        });
 
-        if (lifespan < 1 || lifespan > 120) {
-            alert("Lifespan must be between 1 and 120 years.");
-            lifespanInput.value = "90";
-            return;
-        }
+        // Convert to blob
+        const blob = await new Promise(resolve => {
+            canvas.toBlob(resolve, 'image/png', 1.0);
+        });
 
-        const weeksPassed = calculateWeeksPassed(birthDate, today);
-        renderGrid(weeksPassed, totalWeeks, birthDate);
+        // Create download link
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'my-life-in-weeks.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
 
+        // Reset button state
+        elements.saveButton.textContent = originalText;
+        elements.saveButton.disabled = false;
     } catch (error) {
-        console.error("Error processing date:", error);
-        alert("Invalid date format. Please try again.");
-        weeksGrid.innerHTML = '';
+        console.error('Error exporting image:', error);
+        alert('Failed to export image. Please try again.');
+        // Reset button state
+        elements.saveButton.textContent = originalText;
+        elements.saveButton.disabled = false;
     }
 }
 
+// --- Event Handlers ---
+
+/**
+ * Updates the grid when any input changes
+ */
+function updateGrid() {
+    const birthDate = new Date(elements.birthdateInput.value);
+    const lifespan = parseInt(elements.lifespanInput.value);
+    const totalWeeks = lifespan * WEEKS_IN_YEAR;
+    const weeksPassed = calculateWeeksPassed(birthDate, new Date());
+    
+    renderGrid(weeksPassed, totalWeeks, birthDate);
+}
+
 // --- Event Listeners ---
-birthdateInput.addEventListener('change', updateVisualization);
-lifespanInput.addEventListener('change', updateVisualization);
-lifespanInput.addEventListener('input', updateVisualization);
-showEventsToggle.addEventListener('change', updateVisualization);
-showPhasesToggle.addEventListener('change', updateVisualization);
+elements.birthdateInput.addEventListener('change', updateGrid);
+elements.lifespanInput.addEventListener('change', updateGrid);
+elements.showEventsToggle.addEventListener('change', updateGrid);
+elements.showPhasesToggle.addEventListener('change', updateGrid);
+elements.saveButton.addEventListener('click', exportImage);
+
+// Initial render
+updateGrid();
