@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Life in Weeks</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Your Life in Weeks</h1>
+
+      <div class="input-section">
+        <div class="input-group">
+          <label for="birthdate">Date of Birth:</label>
+          <input type="date" id="birthdate">
+        </div>
+        <div class="input-group">
+          <label for="lifespan">Lifespan (years):</label>
+          <input type="number" id="lifespan" min="1" max="120" value="90">
+        </div>
+      </div>
+
+      <div class="controls-section">
+        <label class="toggle">
+          <input type="checkbox" id="showEvents">
+          <span class="toggle-label">Show Historical Events</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="showPhases" checked>
+          <span class="toggle-label">Show Life Phases</span>
+        </label>
+      </div>
+
+      <div class="grid-container" id="weeksGrid">
+        <!-- Weeks will be generated here by JavaScript -->
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

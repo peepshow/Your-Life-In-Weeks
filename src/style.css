@@ -1,0 +1,449 @@
+/* Basic Reset & Body Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #ff7673;
+    --primary-dark: #e66a68;
+    --secondary-color: #ffc97d;
+    --secondary-dark: #e6b36a;
+    --secondary-light: #ffdca3;
+    --tertiary-color: #64cbfe;
+    --text-primary: #2c3e50;
+    --text-secondary: #7f8c8d;
+    --background: #f8f9fa;
+    --surface: #ffffff;
+    --border: #e0e0e0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--background);
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 10px;
+    line-height: 1.5;
+}
+
+.container {
+    background-color: var(--surface);
+    padding: 20px;
+    width: 100%;
+    max-width: 1200px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+h1 {
+    margin-bottom: 40px;
+    color: var(--text-primary);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    text-align: center;
+    position: relative;
+    padding-bottom: 20px;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+/* Input Section */
+.input-section {
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 48px;
+    align-items: flex-start;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+    min-width: 160px;
+}
+
+.input-group label {
+    font-weight: 400;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.input-group input {
+    padding: 8px 12px;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9375rem;
+    text-align: center;
+    width: 140px;
+    background-color: transparent;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-bottom-color: var(--primary-color);
+}
+
+.input-group input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.input-group input[type="number"]::-webkit-outer-spin-button,
+.input-group input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Controls Section (Toggle) */
+.controls-section {
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.toggle input[type="checkbox"] {
+    appearance: none;
+    width: 40px;
+    height: 20px;
+    background-color: var(--border);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.toggle input[type="checkbox"]::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: var(--surface);
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s ease;
+}
+
+.toggle input[type="checkbox"]:checked {
+    background-color: var(--tertiary-color);
+}
+
+.toggle input[type="checkbox"]:checked::before {
+    transform: translateX(20px);
+}
+
+.toggle-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    user-select: none;
+}
+
+/* Grid Container */
+.phases-and-grid {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.weeks-container {
+    display: grid;
+    grid-template-columns: repeat(52, 1fr);
+    gap: 2px;
+    margin: 0 auto;
+    max-width: 90%;
+    padding: 0;
+    position: relative;
+}
+
+/* Phase Separator */
+.phase-separator {
+    grid-column: 1 / -1;
+    margin: 16px 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.phase-info {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+}
+
+.phase-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.phase-duration {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+/* Individual Week Styling */
+.week {
+    aspect-ratio: 1 / 1;
+    border: none;
+    background-color: rgba(255, 118, 115, 0.2);
+    min-width: 8px;
+    min-height: 8px;
+    transition: background-color 0.2s ease;
+    box-shadow: none;
+    -webkit-appearance: none;
+}
+
+.week.past {
+    border: none;
+    background-color: var(--primary-color);
+    box-shadow: none;
+}
+
+/* Life Phase Styles - these will override the default orange when phases are shown */
+.week.phase-childhood {
+    background-color: rgba(137, 207, 240, 0.2); /* Light Sky Blue tint */
+}
+.week.phase-adolescence {
+    background-color: rgba(144, 238, 144, 0.2); /* Light Green tint */
+}
+.week.phase-early-adulthood {
+    background-color: rgba(255, 223, 186, 0.2); /* Light Orange tint */
+}
+.week.phase-middle-age {
+    background-color: rgba(216, 191, 216, 0.2); /* Thistle (Light Purple) tint */
+}
+.week.phase-late-adulthood {
+    background-color: rgba(173, 216, 230, 0.2); /* Light Blue tint */
+}
+
+/* Past weeks in different phases */
+.week.past.phase-childhood {
+    background-color: rgba(137, 207, 240, 1);
+}
+.week.past.phase-adolescence {
+    background-color: rgba(144, 238, 144, 1);
+}
+.week.past.phase-early-adulthood {
+    background-color: rgba(255, 223, 186, 1);
+}
+.week.past.phase-middle-age {
+    background-color: rgba(216, 191, 216, 1);
+}
+.week.past.phase-late-adulthood {
+    background-color: rgba(173, 216, 230, 1);
+}
+
+/* Event marker styles */
+.week.event {
+    position: relative;
+    background-color: var(--tertiary-color);
+    border-color: var(--tertiary-color);
+}
+
+.week.event::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 4px;
+    height: 4px;
+    background-color: var(--surface);
+    border-radius: 50%;
+    z-index: 2;
+}
+
+/* Custom Tippy Theme */
+.tippy-box[data-theme~='custom'] {
+    background-color: var(--surface);
+    color: var(--text-primary);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.tippy-box[data-theme~='custom'][data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: var(--surface);
+}
+
+.event-tooltip {
+    padding: 4px;
+    text-align: center;
+}
+
+.event-tooltip .event-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.event-tooltip .event-date {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 16px;
+    }
+
+    .weeks-container {
+        max-width: 95%;
+    }
+
+    .phase-separator {
+        margin: 12px 0 6px;
+    }
+
+    .phase-name {
+        font-size: 0.8125rem;
+    }
+
+    .phase-duration {
+        font-size: 0.6875rem;
+    }
+
+    .week {
+        min-width: 6px;
+        min-height: 6px;
+    }
+
+    .input-section {
+        gap: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 8px;
+    }
+
+    .container {
+        padding: 12px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 32px;
+        padding-bottom: 16px;
+    }
+
+    .weeks-container {
+        max-width: 100%;
+    }
+
+    .phase-separator {
+        margin: 10px 0 4px;
+    }
+
+    .week {
+        min-width: 4px;
+        min-height: 4px;
+    }
+
+    .input-section {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .input-group {
+        width: 100%;
+    }
+
+    .input-group input {
+        width: 120px;
+    }
+
+    /* Integrated Toggle Responsive Styles */
+    .toggle {
+        gap: 8px;
+    }
+
+    .toggle input[type="checkbox"] {
+        width: 32px;
+        height: 16px;
+    }
+
+    .toggle input[type="checkbox"]::before {
+        width: 12px;
+        height: 12px;
+    }
+
+    .toggle input[type="checkbox"]:checked::before {
+        transform: translateX(16px);
+    }
+
+    .toggle-label {
+        font-size: 0.75rem;
+    }
+
+    /* Note: Original .week.event::after styles for 480px were different, */
+    /* Using the main centered style for consistency. Adjust if needed. */
+
+    /* Adjust phase tint intensity if needed for smaller screens */
+    /* Example: */
+    /*
+    .week.phase-childhood,
+    .week.phase-adolescence,
+    .week.phase-early-adulthood,
+    .week.phase-middle-age,
+    .week.phase-late-adulthood {
+        background-color: rgba(..., ..., ..., 0.1); // Slightly less intense
+    }
+    */
+}
+
+/* Landscape mode adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+    .container {
+        padding: 12px;
+    }
+
+    .weeks-container {
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .input-section {
+        gap: 32px;
+    }
+
+    .input-group {
+        min-width: 140px;
+    }
+}
