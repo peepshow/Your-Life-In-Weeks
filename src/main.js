@@ -56,7 +56,6 @@ tippy.setDefaultProps({
     placement: 'top',
     duration: [200, 150],
     delay: [100, 0],
-    touch: ['hold', 500], // Hold for 500ms on touch devices
     maxWidth: 300,
     interactive: true,
     appendTo: () => document.body, // Ensures tooltips are always visible
