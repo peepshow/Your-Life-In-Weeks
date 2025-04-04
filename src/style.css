@@ -54,8 +54,8 @@
     --font-size-title: 72px;
     
     /* Fluid Typography - Using clamp for responsive scaling */
-    --fluid-title: clamp(42px, 6vw, 72px);
-    --fluid-huge: clamp(28px, 5vw, 48px);
+    --fluid-title: clamp(42px, 5.8vw,80px);
+    --fluid-huge: clamp(32px, 5vw, 64px);
     --fluid-xxl: clamp(24px, 4vw, 36px);
     --fluid-xl: clamp(18px, 3vw, 24px);
     --fluid-lg: clamp(14px, 1.5vw, 16px);
@@ -122,7 +122,7 @@ body {
     background-color: var(--background);
     color: var(--text-primary);
     min-height: 100vh;
-    padding: var(--spacing-md);
+    padding: 0;
     line-height: 1.5;
 }
 
@@ -131,12 +131,13 @@ body {
  *----------------------------------------------*/
 /* App Container */
 .app-container {
-    max-width: 100%;
+    max-width: 1440px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
     padding: var(--spacing-md);
+    padding-top: 0;
 }
 
 /* Export Frame Container */
@@ -339,10 +340,10 @@ h1 {
     padding: var(--spacing-md);
     border-radius: var(--radius-lg);
     width: 100%;
-    aspect-ratio: 52/80; /* Approximate aspect ratio for 80 years of 52 weeks */
+    aspect-ratio: 52/80;  /* 52 weeks per year, 80 years */
     max-width: 960px;
     margin: 0 auto;
-    overflow: hidden; /* Prevent overflow */
+    overflow: hidden;
 }
 
 /* Grid Structure */
@@ -541,10 +542,11 @@ h1 {
  *----------------------------------------------*/
 .credits {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     color: var(--text-primary);
     font-size: var(--fluid-md);
+    gap: var(--spacing-md);
 }
 
 .signature {
@@ -558,14 +560,14 @@ h1 {
 /* Desktop Layout (≥1024px) */
 @media (min-width: 1024px) {
     body {
-        padding: var(--spacing-xl);
+        padding: 0;
     }
 
     .app-container {
         flex-direction: row;
         align-items: flex-start;
         gap: var(--spacing-xl);
-        padding: 0;
+        padding: var(--spacing-xl);
     }
 
     .toolbar {
@@ -663,15 +665,15 @@ h1 {
     /* Grid */
     .grid-container {
         padding: var(--spacing-sm);
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
     }
     
     .phase-weeks {
-        gap: 0.5px;
+        gap: calc(var(--grid-gap) / 2);
     }
     
     .week {
-        border-radius: 0.5px;
+        border-radius: calc(var(--grid-border-radius) / 2);
     }
 
     /* Event Markers */
@@ -721,4 +723,7 @@ h1 {
 /* Small Mobile Layout (≤480px) */
 @media (max-width: 480px) {
     /* Empty - fluid typography handles this now */
+    .export-frame {
+        padding: var(--spacing-md);
+    }
 }
