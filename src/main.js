@@ -158,13 +158,13 @@ function createWeekElement(weekIndex, weeksPassed, birthDate) {
         }
     }
 
-    // Mark as past if applicable
-    if (weekIndex < weeksPassed) {
+    // Mark as past if applicable and birthDate is set
+    if (birthDate && weekIndex < weeksPassed) {
         weekElement.classList.add('past');
     }
 
-    // Add event marker if enabled
-    if (elements.showEventsToggle.checked) {
+    // Add event marker if enabled and birthDate is set
+    if (elements.showEventsToggle.checked && birthDate) {
         const weekDate = new Date(birthDate);
         weekDate.setDate(weekDate.getDate() + (weekIndex * 7));
         
@@ -359,17 +359,10 @@ async function exportImage() {
  * Updates the grid when any input changes
  */
 function updateGrid() {
-    console.log('Updating grid...');
-    const birthDate = new Date(elements.birthdateInput.value);
+    const birthDate = elements.birthdateInput.value ? new Date(elements.birthdateInput.value) : null;
+    const today = new Date();
+    const weeksPassed = birthDate ? calculateWeeksPassed(birthDate, today) : 0;
     const totalWeeks = LIFESPAN * WEEKS_IN_YEAR;
-    const weeksPassed = calculateWeeksPassed(birthDate, new Date());
-    
-    console.log('Grid parameters:', {
-        birthDate,
-        lifespan: LIFESPAN,
-        totalWeeks,
-        weeksPassed
-    });
     
     renderGrid(weeksPassed, totalWeeks, birthDate);
 }
