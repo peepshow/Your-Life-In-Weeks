@@ -170,7 +170,7 @@ body {
     padding: 0;
 }
 
-/* Export mode class for PNG capture */
+/* Export mode styles for consistent output across all devices */
 .export-frame.export-mode {
     --header-height: 250px;
     --footer-height: 250px;
@@ -178,6 +178,132 @@ body {
     --footer-padding: 0;
     padding: var(--spacing-xxl);
     border-radius: 0;
+    width: var(--export-width) !important;
+    height: var(--export-height) !important;
+    max-width: none;
+    max-height: none;
+    min-width: var(--export-width);
+    min-height: var(--export-height);
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    /* Reset transform properties from responsive styles */
+    transform: none !important;
+    margin: 0 !important;
+}
+
+/* Ensure consistent typography in export mode - override fluid typography */
+.export-frame.export-mode h1 {
+    font-size: var(--font-size-title) !important; /* Fixed size instead of fluid */
+    line-height: 1.1 !important;
+}
+
+.export-frame.export-mode .tagline {
+    font-size: var(--font-size-huge) !important; /* Fixed size instead of fluid */
+    line-height: 1.2 !important;
+}
+
+.export-frame.export-mode .phase-name {
+    font-size: var(--font-size-md) !important; /* Fixed size instead of fluid */
+}
+
+.export-frame.export-mode .phase-duration {
+    font-size: var(--font-size-sm) !important; /* Fixed size instead of fluid */
+}
+
+.export-frame.export-mode .credits {
+    font-size: var(--font-size-md) !important; /* Fixed size instead of fluid */
+}
+
+/* Make content wrapper fill available space in export mode */
+.export-frame.export-mode .content-wrapper {
+    flex: 1 !important;
+    min-height: 0;
+    display: flex !important;
+    flex-direction: column !important;
+    height: calc(var(--export-height) - (2 * var(--spacing-xxl)) - 500px) !important; /* Account for export frame padding and header/footer heights (500px total) */
+    overflow: hidden;
+    position: relative;
+}
+
+/* Ensure the grid container expands to fill available space between header and footer in export mode */
+.export-frame.export-mode .grid-container {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0;
+    overflow: hidden;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: var(--spacing-md) !important;
+}
+
+/* Ensure weeks container and phase-weeks containers expand in export mode */
+.export-frame.export-mode .weeks-container {
+    flex: 1 !important;
+    min-height: 0;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden;
+}
+
+.export-frame.export-mode .phase-weeks {
+    flex: 1 !important;
+    min-height: 0;
+}
+
+.export-frame.export-mode .export-header {
+    flex-shrink: 0 !important;
+    margin-bottom: var(--spacing-md) !important;
+    height: var(--header-height) !important;
+    min-height: var(--header-height) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+}
+
+.export-frame.export-mode .export-footer {
+    flex-shrink: 0 !important;
+    margin-top: var(--spacing-md) !important;
+    height: var(--footer-height) !important;
+    min-height: var(--footer-height) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+}
+
+/* For all viewport sizes, ensure export mode ignores responsive styling */
+@media (max-width: 1024px) {
+    .export-frame.export-mode {
+        transform: none !important;
+        margin: 0 !important;
+        padding: var(--spacing-xxl) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .export-frame.export-mode {
+        transform: none !important;
+        margin: 0 !important;
+        padding: var(--spacing-xxl) !important;
+    }
+    
+    .export-frame.export-mode h1 {
+        font-size: var(--font-size-title) !important;
+    }
+    
+    .export-frame.export-mode .tagline {
+        font-size: var(--font-size-huge) !important;
+    }
+    
+    .export-frame.export-mode .phase-name {
+        font-size: var(--font-size-md) !important;
+    }
+    
+    .export-frame.export-mode .phase-duration {
+        font-size: var(--font-size-sm) !important;
+    }
 }
 
 .export-header {

@@ -409,24 +409,209 @@ async function exportImage() {
         saveButton.disabled = true;
         saveButton.textContent = 'Saving...';
         
-        // Wait for button state to be rendered
-        await new Promise(resolve => requestAnimationFrame(resolve));
-        
         // Add export mode class for correct dimensions
         exportFrame.classList.add('export-mode');
         
-        // Wait for export mode to be applied
-        await new Promise(resolve => requestAnimationFrame(resolve));
+        // Wait longer for export mode to be applied
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         // Capture the frame
         const canvas = await html2canvas(exportFrame, {
-            width: 1080,
-            height: 1920,
+            width: EXPORT_WIDTH,
+            height: EXPORT_HEIGHT,
             scale: 2, // Higher quality
             useCORS: true,
             backgroundColor: null, // Preserve transparency
             logging: true, // Enable logging for debugging
             onclone: (clonedDoc) => {
+                // Apply export mode styles to the cloned document
+                const clonedExportFrame = clonedDoc.getElementById('exportFrame');
+                if (clonedExportFrame) {
+                    // Add export mode class to ensure proper styling
+                    clonedExportFrame.classList.add('export-mode');
+                    
+                    // Create a style element to override responsive styles
+                    const styleOverride = clonedDoc.createElement('style');
+                    styleOverride.textContent = `
+                        /* Force desktop styling in export mode */
+                        .export-frame.export-mode {
+                            width: ${EXPORT_WIDTH}px !important;
+                            height: ${EXPORT_HEIGHT}px !important;
+                            padding: ${EXPORT_PADDING}px !important;
+                            box-sizing: border-box !important;
+                            transform: none !important;
+                            margin: 0 !important;
+                            max-width: none !important;
+                            max-height: none !important;
+                            --header-height: 250px !important;
+                            --footer-height: 250px !important;
+                        }
+                        
+                        /* Force fixed header/footer heights */
+                        .export-frame.export-mode .export-header {
+                            height: 250px !important;
+                            min-height: 250px !important;
+                            flex-shrink: 0 !important;
+                            display: flex !important;
+                            flex-direction: column !important;
+                            justify-content: flex-end !important;
+                        }
+                        
+                        .export-frame.export-mode .export-footer {
+                            height: 250px !important;
+                            min-height: 250px !important;
+                            flex-shrink: 0 !important;
+                            display: flex !important;
+                            flex-direction: column !important;
+                            justify-content: flex-start !important;
+                        }
+                        
+                        /* Typography overrides - use non-fluid fixed sizes */
+                        .export-frame.export-mode h1 {
+                            font-size: 72px !important;
+                            line-height: 1.1 !important;
+                        }
+                        
+                        .export-frame.export-mode .tagline {
+                            font-size: 48px !important;
+                            line-height: 1.2 !important;
+                        }
+                        
+                        .export-frame.export-mode .phase-name {
+                            font-size: 14px !important;
+                        }
+                        
+                        .export-frame.export-mode .phase-duration {
+                            font-size: 12px !important;
+                        }
+                        
+                        .export-frame.export-mode .credits {
+                            font-size: 14px !important;
+                        }
+                        
+                        /* Disable any media queries */
+                        @media (max-width: 1024px) {
+                            .export-frame.export-mode {
+                                transform: none !important;
+                                margin: 0 !important;
+                            }
+                        }
+                        
+                        @media (max-width: 768px) {
+                            .export-frame.export-mode {
+                                transform: none !important;
+                                margin: 0 !important;
+                            }
+                        }
+                    `;
+                    
+                    // Add the style element to the cloned document
+                    clonedDoc.head.appendChild(styleOverride);
+                    
+                    // Force explicit dimensions and styling
+                    clonedExportFrame.style.width = `${EXPORT_WIDTH}px`;
+                    clonedExportFrame.style.height = `${EXPORT_HEIGHT}px`;
+                    clonedExportFrame.style.padding = `${EXPORT_PADDING}px`;
+                    clonedExportFrame.style.boxSizing = 'border-box';
+                    clonedExportFrame.style.display = 'flex';
+                    clonedExportFrame.style.flexDirection = 'column';
+                    clonedExportFrame.style.transform = 'none';
+                    clonedExportFrame.style.margin = '0';
+                    
+                    // Apply styles to content wrapper
+                    const contentWrapper = clonedExportFrame.querySelector('.content-wrapper');
+                    if (contentWrapper) {
+                        contentWrapper.style.flex = '1';
+                        contentWrapper.style.display = 'flex';
+                        contentWrapper.style.flexDirection = 'column';
+                        contentWrapper.style.height = `${EXPORT_HEIGHT - (2 * EXPORT_PADDING) - 500}px`; // 500px = header (250px) + footer (250px)
+                        contentWrapper.style.overflow = 'hidden';
+                    }
+                    
+                    // Apply styles to grid container
+                    const gridContainer = clonedExportFrame.querySelector('.grid-container');
+                    if (gridContainer) {
+                        gridContainer.style.flex = '1';
+                        gridContainer.style.display = 'flex';
+                        gridContainer.style.flexDirection = 'column';
+                        gridContainer.style.minHeight = '0';
+                        gridContainer.style.overflow = 'hidden';
+                        gridContainer.style.width = '100%';
+                        gridContainer.style.maxWidth = 'none';
+                        gridContainer.style.margin = '0';
+                        gridContainer.style.padding = '20px';
+                    }
+                    
+                    // Apply styles to weeks container
+                    const weeksContainer = clonedExportFrame.querySelector('.weeks-container');
+                    if (weeksContainer) {
+                        weeksContainer.style.flex = '1';
+                        weeksContainer.style.display = 'flex';
+                        weeksContainer.style.flexDirection = 'column';
+                        weeksContainer.style.minHeight = '0';
+                        weeksContainer.style.overflow = 'hidden';
+                    }
+                    
+                    // Apply styles to phase-weeks containers
+                    const phaseWeeksContainers = clonedExportFrame.querySelectorAll('.phase-weeks');
+                    phaseWeeksContainers.forEach(container => {
+                        container.style.flex = '1';
+                        container.style.minHeight = '0';
+                    });
+                    
+                    // Force typography to desktop sizes
+                    const heading = clonedExportFrame.querySelector('h1');
+                    if (heading) {
+                        heading.style.fontSize = '72px';
+                        heading.style.lineHeight = '1.1';
+                        heading.style.textAlign = 'center';
+                        heading.style.marginBottom = '12px';
+                    }
+                    
+                    const tagline = clonedExportFrame.querySelector('.tagline');
+                    if (tagline) {
+                        tagline.style.fontSize = '48px';
+                        tagline.style.lineHeight = '1.2';
+                        tagline.style.textAlign = 'center';
+                    }
+                    
+                    const phaseNames = clonedExportFrame.querySelectorAll('.phase-name');
+                    phaseNames.forEach(name => {
+                        name.style.fontSize = '14px';
+                    });
+                    
+                    const phaseDurations = clonedExportFrame.querySelectorAll('.phase-duration');
+                    phaseDurations.forEach(duration => {
+                        duration.style.fontSize = '12px';
+                    });
+                    
+                    const credits = clonedExportFrame.querySelector('.credits');
+                    if (credits) {
+                        credits.style.fontSize = '14px';
+                    }
+                    
+                    // Set explicit heights for header and footer
+                    const header = clonedExportFrame.querySelector('.export-header');
+                    if (header) {
+                        header.style.height = '250px';
+                        header.style.minHeight = '250px';
+                        header.style.flexShrink = '0';
+                        header.style.display = 'flex';
+                        header.style.flexDirection = 'column';
+                        header.style.justifyContent = 'flex-end';
+                    }
+                    
+                    const footer = clonedExportFrame.querySelector('.export-footer');
+                    if (footer) {
+                        footer.style.height = '250px';
+                        footer.style.minHeight = '250px';
+                        footer.style.flexShrink = '0';
+                        footer.style.display = 'flex';
+                        footer.style.flexDirection = 'column';
+                        footer.style.justifyContent = 'flex-start';
+                    }
+                }
+                
                 // Ensure the cloned document has the same button state
                 const clonedButton = clonedDoc.querySelector('.save-button');
                 if (clonedButton) {
