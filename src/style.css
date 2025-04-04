@@ -50,8 +50,8 @@
     --font-size-lg: 16px;
     --font-size-xl: 24px;
     --font-size-xxl: 36px;
-    --font-size-huge: 48px;
-    --font-size-title: 72px;
+    --font-size-huge: 64px;
+    --font-size-title: 80px;
     
     /* Fluid Typography - Using clamp for responsive scaling */
     --fluid-title: clamp(42px, 5.8vw,80px);
@@ -249,8 +249,24 @@ body {
 }
 
 .export-frame.export-mode .phase-weeks {
-    flex: 1 !important;
+    flex: none !important;
     min-height: 0;
+    display: grid !important;
+    grid-auto-rows: 1fr !important;
+    gap: var(--grid-gap) !important;
+}
+
+/* Ensure consistent cell sizing in export mode */
+.export-frame.export-mode .unit {
+    aspect-ratio: 1/1 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+}
+
+.export-frame.export-mode .unit::after {
+    content: '' !important;
+    display: block !important;
+    padding-bottom: 100% !important;
 }
 
 .export-frame.export-mode .export-header {
@@ -538,7 +554,6 @@ h1 {
     grid-auto-rows: 1fr;        /* Add row definition */
     /* display: contents; */     /* Remove this */
     min-height: 0;
-    margin-bottom: var(--grid-gap); /* Keep for spacing between phase groups */
 }
 
 /* Apply columns to .phase-weeks based on view mode */

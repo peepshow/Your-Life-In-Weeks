@@ -466,14 +466,50 @@ async function exportImage() {
                             justify-content: flex-start !important;
                         }
                         
+                        /* Phase weeks and unit sizing */
+                        .export-frame.export-mode .phase-weeks {
+                            flex: none !important;
+                            display: grid !important;
+                            grid-auto-rows: 1fr !important;
+                            gap: var(--grid-gap) !important;
+                            min-height: 0 !important;
+                        }
+                        
+                        .export-frame.export-mode .grid-view-weeks .phase-weeks,
+                        .export-frame.export-mode .phase-weeks.view-weeks {
+                            grid-template-columns: repeat(52, 1fr) !important;
+                        }
+                        
+                        .export-frame.export-mode .grid-view-months .phase-weeks,
+                        .export-frame.export-mode .phase-weeks.view-months {
+                            grid-template-columns: repeat(24, 1fr) !important;
+                        }
+                        
+                        .export-frame.export-mode .grid-view-years .phase-weeks,
+                        .export-frame.export-mode .phase-weeks.view-years {
+                            grid-template-columns: repeat(10, 1fr) !important;
+                        }
+                        
+                        .export-frame.export-mode .unit {
+                            aspect-ratio: 1/1 !important;
+                            min-width: 0 !important;
+                            min-height: 0 !important;
+                        }
+                        
+                        .export-frame.export-mode .unit::after {
+                            content: "" !important;
+                            display: block !important;
+                            padding-bottom: 100% !important;
+                        }
+                        
                         /* Typography overrides - use non-fluid fixed sizes */
                         .export-frame.export-mode h1 {
-                            font-size: 72px !important;
+                            font-size: 80px !important;
                             line-height: 1.1 !important;
                         }
                         
                         .export-frame.export-mode .tagline {
-                            font-size: 48px !important;
+                            font-size: 64px !important;
                             line-height: 1.2 !important;
                         }
                         
@@ -555,14 +591,37 @@ async function exportImage() {
                     // Apply styles to phase-weeks containers
                     const phaseWeeksContainers = clonedExportFrame.querySelectorAll('.phase-weeks');
                     phaseWeeksContainers.forEach(container => {
-                        container.style.flex = '1';
-                        container.style.minHeight = '0';
+                        // Remove flex: 1 and use grid properties instead
+                        container.style.flex = 'none';
+                        container.style.display = 'grid';
+                        container.style.gridAutoRows = '1fr';
+                        container.style.gap = 'var(--grid-gap)';
+                        
+                        // Keep the columns based on view mode
+                        if (container.classList.contains('view-weeks') || 
+                            container.closest('.grid-view-weeks')) {
+                            container.style.gridTemplateColumns = 'repeat(52, 1fr)';
+                        } else if (container.classList.contains('view-months') || 
+                            container.closest('.grid-view-months')) {
+                            container.style.gridTemplateColumns = 'repeat(24, 1fr)';
+                        } else if (container.classList.contains('view-years') || 
+                            container.closest('.grid-view-years')) {
+                            container.style.gridTemplateColumns = 'repeat(10, 1fr)';
+                        }
+                    });
+                    
+                    // Ensure consistent unit sizing
+                    const units = clonedExportFrame.querySelectorAll('.unit');
+                    units.forEach(unit => {
+                        unit.style.aspectRatio = '1/1';
+                        unit.style.minWidth = '0';
+                        unit.style.minHeight = '0';
                     });
                     
                     // Force typography to desktop sizes
                     const heading = clonedExportFrame.querySelector('h1');
                     if (heading) {
-                        heading.style.fontSize = '72px';
+                        heading.style.fontSize = '80px';
                         heading.style.lineHeight = '1.1';
                         heading.style.textAlign = 'center';
                         heading.style.marginBottom = '12px';
@@ -570,7 +629,7 @@ async function exportImage() {
                     
                     const tagline = clonedExportFrame.querySelector('.tagline');
                     if (tagline) {
-                        tagline.style.fontSize = '48px';
+                        tagline.style.fontSize = '64px';
                         tagline.style.lineHeight = '1.2';
                         tagline.style.textAlign = 'center';
                     }
