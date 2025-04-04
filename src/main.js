@@ -9,6 +9,7 @@ const WEEKS_IN_YEAR = 52;
 const EXPORT_WIDTH = 1080;
 const EXPORT_HEIGHT = 1920;
 const EXPORT_PADDING = 48; // var(--spacing-xxl)
+const LIFESPAN = 80; // Fixed lifespan in years
 
 /**
  * Configuration for different life phases
@@ -40,7 +41,6 @@ const historicalEvents = [
 // --- DOM Elements ---
 const elements = {
     birthdateInput: document.getElementById('birthdate'),
-    lifespanInput: document.getElementById('lifespan'),
     showEventsToggle: document.getElementById('showEvents'),
     showPhasesToggle: document.getElementById('showPhases'),
     weeksGrid: document.getElementById('weeksGrid'),
@@ -322,13 +322,12 @@ async function exportImage() {
 function updateGrid() {
     console.log('Updating grid...');
     const birthDate = new Date(elements.birthdateInput.value);
-    const lifespan = parseInt(elements.lifespanInput.value);
-    const totalWeeks = lifespan * WEEKS_IN_YEAR;
+    const totalWeeks = LIFESPAN * WEEKS_IN_YEAR;
     const weeksPassed = calculateWeeksPassed(birthDate, new Date());
     
     console.log('Grid parameters:', {
         birthDate,
-        lifespan,
+        lifespan: LIFESPAN,
         totalWeeks,
         weeksPassed
     });
@@ -338,7 +337,6 @@ function updateGrid() {
 
 // --- Event Listeners ---
 elements.birthdateInput.addEventListener('change', updateGrid);
-elements.lifespanInput.addEventListener('change', updateGrid);
 elements.showEventsToggle.addEventListener('change', updateGrid);
 elements.showPhasesToggle.addEventListener('change', updateGrid);
 elements.saveButton.addEventListener('click', exportImage);
