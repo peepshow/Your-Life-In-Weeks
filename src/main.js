@@ -56,6 +56,13 @@ const elements = {
     exportFrame: document.getElementById('exportFrame')
 };
 
+// Validate required elements are present
+if (!elements.birthdateInput || !elements.showEventsToggle || 
+    !elements.showPhasesToggle || !elements.weeksGrid || 
+    !elements.saveButton || !elements.exportFrame) {
+    console.error('Critical DOM elements missing:', elements);
+}
+
 // Configure default Tippy options
 tippy.setDefaultProps({
     theme: 'custom',
@@ -469,11 +476,48 @@ async function exportImage() {
                         }
                         
                         /* Footer content styling - ensure desktop sizing */
+                        .export-frame.export-mode .export-footer {
+                            height: 250px !important;
+                            min-height: 250px !important;
+                            display: flex !important;
+                            flex-direction: column !important;
+                            justify-content: flex-start !important;
+                            padding: 0 !important;
+                        }
+                        
+                        .export-frame.export-mode .tagline {
+                            padding: ${window.getComputedStyle(document.documentElement).getPropertyValue('--spacing-sm')} 0 !important;
+                        }
+                        
+                        .export-frame.export-mode .tagline h2 {
+                            font-size: ${window.getComputedStyle(document.documentElement).getPropertyValue('--font-size-huge')} !important;
+                            line-height: 1 !important;
+                            margin-bottom: 0 !important;
+                            text-align: center !important;
+                            color: var(--surface) !important;
+                        }
+                        
                         .export-frame.export-mode .credits {
-                            font-size: ${window.getComputedStyle(document.documentElement).getPropertyValue('--font-size-md')} !important;
                             gap: ${window.getComputedStyle(document.documentElement).getPropertyValue('--spacing-md')} !important;
-                            justify-content: center !important;
+                            justify-content: space-between !important;
                             align-items: center !important;
+                            width: 100% !important;
+                            display: flex !important;
+                            padding: 0 ${window.getComputedStyle(document.documentElement).getPropertyValue('--spacing-md')} !important;
+                        }
+                        
+                        .export-frame.export-mode .credits span {
+                            padding-top: ${window.getComputedStyle(document.documentElement).getPropertyValue('--spacing-sm')} !important;
+                            color: #FFD8A2 !important;
+                            font-size: ${window.getComputedStyle(document.documentElement).getPropertyValue('--font-size-xl')} !important;
+                            font-family: var(--heading-font) !important;
+                        }
+                        
+                        .export-frame.export-mode .logo {
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            padding-top: ${window.getComputedStyle(document.documentElement).getPropertyValue('--spacing-sm')} !important;
                         }
                         
                         .export-frame.export-mode .signature {
@@ -555,10 +599,15 @@ function updateGrid() {
 elements.birthdateInput.addEventListener('change', updateGrid);
 elements.showEventsToggle.addEventListener('change', updateGrid);
 elements.showPhasesToggle.addEventListener('change', updateGrid);
-elements.viewModeSelect.addEventListener('change', (event) => {
-    currentViewMode = event.target.value;
-    updateGrid();
-});
+
+// Only attach event listener if viewModeSelect exists
+if (elements.viewModeSelect) {
+    elements.viewModeSelect.addEventListener('change', (event) => {
+        currentViewMode = event.target.value;
+        updateGrid();
+    });
+}
+
 elements.saveButton.addEventListener('click', exportImage);
 
 // Initial render

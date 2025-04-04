@@ -212,10 +212,18 @@ body {
 }
 
 .export-frame.export-mode .credits {
-    font-size: var(--font-size-md) !important; /* Use fixed size instead of fluid */
-    gap: var(--spacing-md) !important; /* Fixed spacing */
-    justify-content: center !important;
+    gap: var(--spacing-md) !important;
+    justify-content: space-between !important;
+    display: flex !important;
+    width: 100% !important;
     align-items: center !important;
+}
+
+.export-frame.export-mode .credits span {
+    padding-top: var(--spacing-sm) !important;
+    color: #FFD8A2 !important;
+    font-size: var(--font-size-xl) !important;
+    font-family: var(--heading-font) !important;
 }
 
 .export-frame.export-mode .signature {
@@ -295,6 +303,24 @@ body {
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
+    padding: 0 !important;
+}
+
+.export-frame.export-mode .tagline {
+    padding: var(--spacing-sm) 0 !important;
+}
+
+.export-frame.export-mode .tagline h2 {
+    font-size: var(--font-size-huge) !important;
+    line-height: 1 !important;
+    margin-bottom: 0 !important;
+}
+
+.export-frame.export-mode .logo {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding-top: var(--spacing-sm) !important;
 }
 
 /* For all viewport sizes, ensure export mode ignores responsive styling */
@@ -330,8 +356,11 @@ body {
     }
 
     .export-frame.export-mode .credits {
-        font-size: var(--font-size-md) !important;
+        font-size: var(--font-size-lg) !important;
         gap: var(--spacing-md) !important;
+        justify-content: space-between !important;
+        display: flex !important;
+        width: 100% !important;
     }
     
     .export-frame.export-mode .signature {
@@ -350,10 +379,9 @@ body {
 .export-footer {
     margin-top: auto;
     height: var(--footer-height);
-    padding-top: var(--footer-padding);
-    display: flex;
+  display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
 }
 
 /*----------------------------------------------
@@ -363,18 +391,18 @@ h1 {
     font-family: var(--heading-font);
     color: var(--text-primary);
     font-size: var(--fluid-title);
-  line-height: 1.1;
+    line-height: 1;
     text-align: center;
     text-transform: uppercase;
     flex-shrink: 0;
     margin-bottom: var(--spacing-sm);
 }
 
-.tagline {
+h2 {
     font-family: var(--heading-font);
     color: var(--surface);
     font-size: var(--fluid-huge);
-    line-height: 1.2;
+    line-height: 1;
     margin-bottom: var(--fluid-spacing-xs);
   text-align: center;
 }
@@ -733,15 +761,26 @@ h1 {
 /*----------------------------------------------
  * 10. FOOTER COMPONENTS
  *----------------------------------------------*/
+ .tagline {
+    padding: var(--spacing-sm) 0;
+ }
+ .credits span {
+    padding-top: var(--spacing-sm);
+    color: #FFD8A2;
+    font-size: var(--fluid-lg);
+    font-family: var(--heading-font);
+ }
 .credits {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--text-primary);
-    font-size: var(--fluid-md);
-    gap: var(--spacing-md);
+    justify-content: space-between;
+    padding: 0 var(--spacing-md);
 }
-
+.logo   {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: var(--spacing-sm);
+}
 .signature {
     height: clamp(28px, 2.5vw, 48px);
     width: auto;
@@ -912,10 +951,13 @@ h1 {
         bottom: 0;
         z-index: 2;
     }
-    .credits {
-        font-size: var(--fluid-md);
-        gap: var(--spacing-md);
-        }
+
+        .credits span {
+            padding-top: var(--spacing-sm);
+            color: #FFD8A2;
+            font-size: var(--fluid-lg);
+            font-family: var(--heading-font);
+         }
     
 }
 
@@ -928,6 +970,7 @@ h1 {
   .credits {
     font-size: var(--fluid-md);
     gap: var(--spacing-xs);
+    padding: 0;
     }
 }
 
