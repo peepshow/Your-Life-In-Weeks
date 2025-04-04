@@ -17,12 +17,20 @@
         </div>
 
         <div class="controls-section">
+          <div class="input-group">
+            <label for="viewMode">VIEW</label>
+            <select id="viewMode">
+              <option value="Weeks" selected>Weeks</option>
+              <option value="Months">Months</option>
+              <option value="Years">Years</option>
+            </select>
+          </div>
           <label class="toggle">
-            <span class="toggle-label">Historical Events</span>
+            <span class="toggle-label">Show Historical Events</span>
             <input type="checkbox" id="showEvents">
           </label>
           <label class="toggle">
-            <span class="toggle-label">Life Phases</span>
+            <span class="toggle-label">Show Life Phases</span>
             <input type="checkbox" id="showPhases">
           </label>
           <button id="saveButton" class="save-button">SAVE A COPY</button>

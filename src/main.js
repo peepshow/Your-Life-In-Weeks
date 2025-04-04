@@ -6,10 +6,17 @@ import html2canvas from 'html2canvas';
 
 // --- Constants ---
 const WEEKS_IN_YEAR = 52;
+const MONTHS_IN_YEAR = 12;
 const EXPORT_WIDTH = 1080;
 const EXPORT_HEIGHT = 1920;
 const EXPORT_PADDING = 48; // var(--spacing-xxl)
 const LIFESPAN = 80; // Fixed lifespan in years
+
+const VIEW_MODES = {
+  WEEKS: 'Weeks',
+  MONTHS: 'Months',
+  YEARS: 'Years'
+};
 
 /**
  * Configuration for different life phases
@@ -43,6 +50,7 @@ const elements = {
     birthdateInput: document.getElementById('birthdate'),
     showEventsToggle: document.getElementById('showEvents'),
     showPhasesToggle: document.getElementById('showPhases'),
+    viewModeSelect: document.getElementById('viewMode'),
     weeksGrid: document.getElementById('weeksGrid'),
     saveButton: document.getElementById('saveButton'),
     exportFrame: document.getElementById('exportFrame')
@@ -70,6 +78,9 @@ tippy.setDefaultProps({
     }
 });
 
+// --- State ---
+let currentViewMode = VIEW_MODES.WEEKS; // Default to weeks view
+
 // --- Helper Functions ---
 
 /**
@@ -84,8 +95,37 @@ function calculateWeeksPassed(startDate, endDate) {
 }
 
 /**
+ * Calculates the number of months between two dates
+ * @param {Date} startDate - The start date
+ * @param {Date} endDate - The end date
+ * @returns {number} The number of months elapsed
+ */
+function calculateMonthsPassed(startDate, endDate) {
+    let months = (endDate.getFullYear() - startDate.getFullYear()) * 12;
+    months -= startDate.getMonth();
+    months += endDate.getMonth();
+    return months <= 0 ? 0 : months;
+}
+
+/**
+ * Calculates the number of years between two dates
+ * @param {Date} startDate - The start date
+ * @param {Date} endDate - The end date
+ * @returns {number} The number of years elapsed
+ */
+function calculateYearsPassed(startDate, endDate) {
+    const years = endDate.getFullYear() - startDate.getFullYear();
+    // Adjust if the birthday hasn't happened yet this year
+    if (endDate.getMonth() < startDate.getMonth() || 
+       (endDate.getMonth() === startDate.getMonth() && endDate.getDate() < startDate.getDate())) {
+        return Math.max(0, years - 1);
+    }
+    return Math.max(0, years);
+}
+
+/**
  * Finds events that occurred during a specific week
- * @param {Date} weekDate - The date of the week to check
+ * @param {Date} weekDate - The start date of the week to check
  * @returns {Array} Array of events that occurred during that week
  */
 function findEventsForWeek(weekDate) {
@@ -96,6 +136,36 @@ function findEventsForWeek(weekDate) {
     return historicalEvents.filter(event => {
         const eventDate = new Date(event.date);
         return eventDate >= weekStart && eventDate < weekEnd;
+    });
+}
+
+/**
+ * Finds events that occurred during a specific month
+ * @param {Date} monthDate - A date within the month to check (typically the 1st)
+ * @returns {Array} Array of events that occurred during that month
+ */
+function findEventsForMonth(monthDate) {
+    const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+    const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1);
+    
+    return historicalEvents.filter(event => {
+        const eventDate = new Date(event.date);
+        return eventDate >= monthStart && eventDate < monthEnd;
+    });
+}
+
+/**
+ * Finds events that occurred during a specific year
+ * @param {Date} yearDate - A date within the year to check (typically the 1st)
+ * @returns {Array} Array of events that occurred during that year
+ */
+function findEventsForYear(yearDate) {
+    const yearStart = new Date(yearDate.getFullYear(), 0, 1); // January 1st
+    const yearEnd = new Date(yearDate.getFullYear() + 1, 0, 1); // January 1st of next year
+    
+    return historicalEvents.filter(event => {
+        const eventDate = new Date(event.date);
+        return eventDate >= yearStart && eventDate < yearEnd;
     });
 }
 
@@ -116,7 +186,7 @@ function createPhaseSeparator(phase) {
         <div class="phase-info">
             <span class="phase-name">${phase.name}</span>
             <span class="phase-duration">${duration}</span>
-        </div>
+    </div>
     `;
     
     return phaseSeparator;
@@ -135,42 +205,67 @@ function createPhaseWeeksContainer(weeks) {
 }
 
 /**
- * Creates a week element with appropriate classes and event handlers
- * @param {number} weekIndex - The index of the week
- * @param {number} weeksPassed - Number of weeks that have passed
- * @param {Date} birthDate - The user's birth date
- * @returns {HTMLElement} The week element
+ * Creates a unit element (week/month/year) with appropriate classes
+ * @param {number} unitIndex - The index of the unit
+ * @param {number} unitsPassed - Number of units that have passed
+ * @param {Date | null} birthDate - The user's birth date
+ * @param {string} viewMode - The current view mode (Weeks, Months, Years)
+ * @returns {HTMLElement} The unit element
  */
-function createWeekElement(weekIndex, weeksPassed, birthDate) {
-    const weekElement = document.createElement('div');
-    weekElement.classList.add('week');
+function createUnitElement(unitIndex, unitsPassed, birthDate, viewMode) {
+    const unitElement = document.createElement('div');
+    unitElement.classList.add('unit');
 
-    const ageInYears = weekIndex / WEEKS_IN_YEAR;
-
-    // Add phase class if enabled
+    // Apply phase class if phase toggle is checked (regardless of view mode)
     if (elements.showPhasesToggle.checked) {
+        // Calculate age in years based on the current view mode
+        let ageInYears;
+        if (viewMode === VIEW_MODES.WEEKS) {
+            ageInYears = unitIndex / WEEKS_IN_YEAR;
+        } else if (viewMode === VIEW_MODES.MONTHS) {
+            ageInYears = unitIndex / MONTHS_IN_YEAR;
+        } else { // Years view
+            ageInYears = unitIndex;
+        }
+        
+        // Find and apply the corresponding phase class
         const phaseIndex = lifePhases.findIndex(phase => 
             ageInYears >= phase.startAge && ageInYears < phase.endAge
         );
-        
         if (phaseIndex !== -1) {
-            weekElement.classList.add(lifePhases[phaseIndex].className);
+            unitElement.classList.add(lifePhases[phaseIndex].className);
         }
     }
 
     // Mark as past if applicable and birthDate is set
-    if (birthDate && weekIndex < weeksPassed) {
-        weekElement.classList.add('past');
+    if (birthDate && unitIndex < unitsPassed) {
+        unitElement.classList.add('past');
     }
 
-    // Add event marker if enabled and birthDate is set
-    if (elements.showEventsToggle.checked && birthDate) {
-        const weekDate = new Date(birthDate);
-        weekDate.setDate(weekDate.getDate() + (weekIndex * 7));
+    // Event marker logic (Weeks, Months, and Years views)
+    const shouldShowEvents = elements.showEventsToggle.checked && birthDate && 
+                             (viewMode === VIEW_MODES.WEEKS || viewMode === VIEW_MODES.MONTHS || viewMode === VIEW_MODES.YEARS);
+                             
+    if (shouldShowEvents) {
+        let unitStartDate;
+        let findEventsFunction;
+
+        if (viewMode === VIEW_MODES.WEEKS) {
+            unitStartDate = new Date(birthDate);
+            unitStartDate.setDate(birthDate.getDate() + (unitIndex * 7));
+            findEventsFunction = findEventsForWeek;
+        } else if (viewMode === VIEW_MODES.MONTHS) {
+            unitStartDate = new Date(birthDate.getFullYear(), birthDate.getMonth() + unitIndex, 1);
+            findEventsFunction = findEventsForMonth;
+        } else { // Years view
+            unitStartDate = new Date(birthDate.getFullYear() + unitIndex, 0, 1); // January 1st of the target year
+            findEventsFunction = findEventsForYear;
+        }
         
-        const events = findEventsForWeek(weekDate);
+        const events = findEventsFunction(unitStartDate);
+        
         if (events.length > 0) {
-            weekElement.classList.add('event');
+            unitElement.classList.add('event');
             const eventDetails = events.map(e => {
                 const eventDate = new Date(e.date);
                 const formattedDate = eventDate.toLocaleDateString('en-US', {
@@ -184,18 +279,16 @@ function createWeekElement(weekIndex, weeksPassed, birthDate) {
                 </div>`;
             }).join('');
             
-            // Create content container for absolute positioning
             const contentContainer = document.createElement('div');
-            contentContainer.className = 'week-content';
-            weekElement.appendChild(contentContainer);
+            contentContainer.className = 'week-content'; // Keep class for styling consistency
+            unitElement.appendChild(contentContainer);
             
-            tippy(weekElement, {
+            tippy(unitElement, {
                 content: eventDetails,
                 allowHTML: true,
                 maxWidth: window.innerWidth < 768 ? 250 : 300,
                 interactive: true,
                 onShow(instance) {
-                    // Ensure tooltip is positioned within viewport
                     const rect = instance.reference.getBoundingClientRect();
                     if (window.innerWidth < 768) {
                         instance.setProps({
@@ -207,85 +300,100 @@ function createWeekElement(weekIndex, weeksPassed, birthDate) {
         }
     }
 
-    return weekElement;
+    return unitElement;
 }
 
 /**
- * Renders the life weeks grid
- * @param {number} weeksPassed - Number of weeks that have passed
- * @param {number} totalWeeks - Total number of weeks in the lifespan
- * @param {Date} birthDate - The user's birth date
+ * Renders the life grid based on the selected view mode
+ * @param {number} unitsPassed - Number of units (weeks/months/years) that have passed
+ * @param {number} totalUnits - Total number of units in the lifespan
+ * @param {Date | null} birthDate - The user's birth date
+ * @param {string} viewMode - The current view mode (Weeks, Months, Years)
  */
-function renderGrid(weeksPassed, totalWeeks, birthDate) {
-    const lifespan = totalWeeks / WEEKS_IN_YEAR;
+function renderGrid(unitsPassed, totalUnits, birthDate, viewMode) {
+    // Update the main title
+    const titleElement = elements.exportFrame.querySelector('.export-header h1');
+    if (titleElement) {
+        titleElement.textContent = `My Life in ${viewMode}`;
+    }
+    
+    // Calculate lifespan for logging (still based on years)
+    const lifespanYears = (viewMode === VIEW_MODES.YEARS) ? totalUnits : 
+                       (viewMode === VIEW_MODES.MONTHS) ? totalUnits / MONTHS_IN_YEAR : 
+                       totalUnits / WEEKS_IN_YEAR;
     
     // Clear previous grid and tooltips
     elements.weeksGrid.innerHTML = '';
     const oldTippyInstances = document.querySelectorAll('[data-tippy-root]');
     oldTippyInstances.forEach(instance => instance._tippy && instance._tippy.destroy());
 
-    // Create containers
-    const phasesAndGrid = document.createElement('div');
-    phasesAndGrid.className = 'phases-and-grid';
-    
-    // Add default-view class if phases are not enabled
-    if (!elements.showPhasesToggle.checked) {
-        phasesAndGrid.classList.add('default-view');
-    }
+    // Set view mode class on grid container
+    elements.weeksGrid.className = `grid-container grid-view-${viewMode.toLowerCase()}`;
 
+    // Determine if we need to render phases (Weeks, Months, or Years view)
+    const shouldRenderPhases = (viewMode === VIEW_MODES.WEEKS || viewMode === VIEW_MODES.MONTHS || viewMode === VIEW_MODES.YEARS) 
+                               && elements.showPhasesToggle.checked;
+
+    // The main container for grid content
     const weeksContainer = document.createElement('div');
-    weeksContainer.className = 'weeks-container';
+    weeksContainer.className = 'weeks-container'; 
 
+    let currentPhaseWeeksContainer = null;
     let currentPhaseIndex = -1;
-    let currentPhaseWeeks = [];
 
-    // Create and add week elements
-    for (let i = 0; i < totalWeeks; i++) {
-        const weekElement = createWeekElement(i, weeksPassed, birthDate);
-        
-        if (elements.showPhasesToggle.checked) {
-            const ageInYears = i / WEEKS_IN_YEAR;
+    // Create and add unit elements
+    for (let i = 0; i < totalUnits; i++) {
+        const unitElement = createUnitElement(i, unitsPassed, birthDate, viewMode);
+
+        if (shouldRenderPhases) {
+            // Calculate age based on view mode
+            let ageInYears;
+            if (viewMode === VIEW_MODES.WEEKS) {
+                ageInYears = i / WEEKS_IN_YEAR;
+            } else if (viewMode === VIEW_MODES.MONTHS) {
+                ageInYears = i / MONTHS_IN_YEAR;
+            } else { // Years view
+                ageInYears = i;
+            }
+            
             const phaseIndex = lifePhases.findIndex(phase => 
                 ageInYears >= phase.startAge && ageInYears < phase.endAge
             );
-            
+
             if (phaseIndex !== -1 && phaseIndex !== currentPhaseIndex) {
-                // Add previous phase's weeks
-                if (currentPhaseWeeks.length > 0) {
-                    weeksContainer.appendChild(createPhaseWeeksContainer(currentPhaseWeeks));
-                    currentPhaseWeeks = [];
-                }
-                
-                // Create and add phase separator directly to the weeks container
-                if (phaseIndex >= 0) {
-                    const phaseSeparator = createPhaseSeparator(lifePhases[phaseIndex]);
-                    weeksContainer.appendChild(phaseSeparator);
-                }
+                // Create and add phase separator
+                const phaseSeparator = createPhaseSeparator(lifePhases[phaseIndex]);
+                weeksContainer.appendChild(phaseSeparator);
+
+                // Create a new container for this phase's units
+                currentPhaseWeeksContainer = document.createElement('div');
+                currentPhaseWeeksContainer.className = 'phase-weeks'; // Keep this class
+                weeksContainer.appendChild(currentPhaseWeeksContainer);
                 
                 currentPhaseIndex = phaseIndex;
             }
-            
-            currentPhaseWeeks.push(weekElement);
-        } else {
-            // If phases are disabled, group weeks by year for better organization
-            if (i % WEEKS_IN_YEAR === 0 && i > 0 && currentPhaseWeeks.length > 0) {
-                weeksContainer.appendChild(createPhaseWeeksContainer(currentPhaseWeeks));
-                currentPhaseWeeks = [];
+
+            // Add unit to the current phase container (if it exists)
+            if (currentPhaseWeeksContainer) {
+                currentPhaseWeeksContainer.appendChild(unitElement);
             }
-            
-            currentPhaseWeeks.push(weekElement);
+        } else {
+            // No phases: Need a single container for all units
+            if (!currentPhaseWeeksContainer) {
+                 // Create the container if it doesn't exist
+                currentPhaseWeeksContainer = document.createElement('div');
+                 // Apply appropriate class based on view mode for column styling
+                currentPhaseWeeksContainer.className = `phase-weeks view-${viewMode.toLowerCase()}`;
+                weeksContainer.appendChild(currentPhaseWeeksContainer);
+                currentPhaseIndex = 0; // Mark as having a container
+            }
+            currentPhaseWeeksContainer.appendChild(unitElement);
         }
     }
     
-    // Add any remaining weeks
-    if (currentPhaseWeeks.length > 0) {
-        weeksContainer.appendChild(createPhaseWeeksContainer(currentPhaseWeeks));
-    }
+    elements.weeksGrid.appendChild(weeksContainer);
     
-    phasesAndGrid.appendChild(weeksContainer);
-    elements.weeksGrid.appendChild(phasesAndGrid);
-    
-    console.log(`Grid rendered: ${weeksPassed} weeks passed out of ${totalWeeks} total weeks (${lifespan} years)`);
+    console.log(`Grid rendered: ${unitsPassed} ${viewMode} passed out of ${totalUnits} total ${viewMode} (${lifespanYears} years)`);
 }
 
 /**
@@ -361,19 +469,41 @@ async function exportImage() {
 function updateGrid() {
     const birthDate = elements.birthdateInput.value ? new Date(elements.birthdateInput.value) : null;
     const today = new Date();
-    const weeksPassed = birthDate ? calculateWeeksPassed(birthDate, today) : 0;
-    const totalWeeks = LIFESPAN * WEEKS_IN_YEAR;
+
+    let unitsPassed = 0;
+    let totalUnits = 0;
+
+    switch (currentViewMode) {
+        case VIEW_MODES.MONTHS:
+            unitsPassed = birthDate ? calculateMonthsPassed(birthDate, today) : 0;
+            totalUnits = LIFESPAN * MONTHS_IN_YEAR;
+            break;
+        case VIEW_MODES.YEARS:
+            unitsPassed = birthDate ? calculateYearsPassed(birthDate, today) : 0;
+            totalUnits = LIFESPAN;
+            break;
+        case VIEW_MODES.WEEKS:
+        default:
+            unitsPassed = birthDate ? calculateWeeksPassed(birthDate, today) : 0;
+            totalUnits = LIFESPAN * WEEKS_IN_YEAR;
+            break;
+    }
     
-    renderGrid(weeksPassed, totalWeeks, birthDate);
+    renderGrid(unitsPassed, totalUnits, birthDate, currentViewMode);
 }
 
 // --- Event Listeners ---
 elements.birthdateInput.addEventListener('change', updateGrid);
 elements.showEventsToggle.addEventListener('change', updateGrid);
 elements.showPhasesToggle.addEventListener('change', updateGrid);
+elements.viewModeSelect.addEventListener('change', (event) => {
+    currentViewMode = event.target.value;
+    updateGrid();
+});
 elements.saveButton.addEventListener('click', exportImage);
 
 // Initial render
 console.log('Starting initial render...');
 console.log('DOM Elements:', elements);
 updateGrid();
+

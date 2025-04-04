@@ -192,7 +192,7 @@ body {
     margin-top: auto;
     height: var(--footer-height);
     padding-top: var(--footer-padding);
-    display: flex;
+  display: flex;
     flex-direction: column;
     justify-content: flex-start;
 }
@@ -204,7 +204,7 @@ h1 {
     font-family: var(--heading-font);
     color: var(--text-primary);
     font-size: var(--fluid-title);
-    line-height: 1.1;
+  line-height: 1.1;
     text-align: center;
     text-transform: uppercase;
     flex-shrink: 0;
@@ -217,7 +217,7 @@ h1 {
     font-size: var(--fluid-huge);
     line-height: 1.2;
     margin-bottom: var(--fluid-spacing-xs);
-    text-align: center;
+  text-align: center;
 }
 
 /*----------------------------------------------
@@ -250,13 +250,13 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--spacing-md);
+    gap: var(--spacing-xs);
     width: 100%;
 }
 
 .input-group label {
     font-family: var(--heading-font);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-md);
     font-weight: bold;
     color: var(--text-primary);
     text-transform: uppercase;
@@ -264,7 +264,8 @@ h1 {
     order: 1;
 }
 
-.input-group input {
+.input-group input,
+.input-group select {
     padding: var(--spacing-xs) var(--spacing-sm);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -273,9 +274,11 @@ h1 {
     width: 140px;
     order: 2;
     transition: border-color 0.2s;
+    background-color: var(--surface); /* Match input background */
 }
 
-.input-group input:focus {
+.input-group input:focus,
+.input-group select:focus {
     outline: none;
     border-color: var(--accent-blue);
 }
@@ -342,7 +345,7 @@ h1 {
     padding: 10px var(--spacing-md);
     font-size: var(--font-size-md);
     font-weight: 600;
-    cursor: pointer;
+  cursor: pointer;
     transition: background-color 0.2s;
 }
 
@@ -361,10 +364,22 @@ h1 {
     padding: var(--spacing-md);
     border-radius: var(--radius-lg);
     width: 100%;
-    aspect-ratio: 52/80;  /* 52 weeks per year, 80 years */
     max-width: 960px;
     margin: 0 auto;
     overflow: hidden;
+}
+
+/* Grid View Specific Aspect Ratios */
+.grid-view-weeks {
+    aspect-ratio: 52 / 80; /* Original: 52x80 */
+}
+
+.grid-view-months {
+    aspect-ratio: 24 / 40; /* New: 24x40 */
+}
+
+.grid-view-years {
+    aspect-ratio: 10 / 8;  /* New: 10x8 */
 }
 
 /* Grid Structure */
@@ -378,110 +393,106 @@ h1 {
 }
 
 .weeks-container {
-    display: flex;
+    display: flex;        /* Revert to flex */
     flex-direction: column;
-    gap: 0;
+    gap: 0;               /* Remove gap here */
     height: 100%;
     width: 100%;
-    overflow: hidden; /* Prevent overflow */
+    overflow: hidden;
 }
+
+/* Remove columns from .weeks-container */
+/* .grid-view-weeks .weeks-container { ... } */
+/* .grid-view-months .weeks-container { ... } */
+/* .grid-view-years .weeks-container { ... } */
 
 .phase-weeks {
-    display: grid;
+    display: grid;              /* Restore grid */
+    gap: var(--grid-gap);     /* Restore gap */
+    grid-auto-rows: 1fr;        /* Add row definition */
+    /* display: contents; */     /* Remove this */
+    min-height: 0;
+    margin-bottom: var(--grid-gap); /* Keep for spacing between phase groups */
+}
+
+/* Apply columns to .phase-weeks based on view mode */
+.grid-view-weeks .phase-weeks {
     grid-template-columns: repeat(52, 1fr);
-    grid-auto-rows: 1fr;
-    gap: var(--grid-gap);
-    min-height: 0; /* Allow flex container to shrink */
-    margin-bottom: var(--grid-gap);
 }
 
-/* Apply flex: 1 only in default view (without phases) */
-.default-view .phase-weeks {
-    flex: 1;
+.grid-view-months .phase-weeks {
+    grid-template-columns: repeat(24, 1fr);
 }
 
-/* Week Cell Styles */
-.week {
-    position: relative;
-    background-color: rgba(255, 140, 89, 0.2);
-    transition: background-color 0.2s ease;
+.grid-view-years .phase-weeks {
+    grid-template-columns: repeat(10, 1fr);
+}
+
+/* Apply columns when NO phases are shown (single container) */
+.phase-weeks.view-weeks {
+    grid-template-columns: repeat(52, 1fr);
+}
+
+.phase-weeks.view-months {
+    grid-template-columns: repeat(24, 1fr);
+}
+
+.phase-weeks.view-years {
+    grid-template-columns: repeat(10, 1fr);
+}
+
+/* Individual Unit */
+.unit {
+    background-color: rgba(255, 140, 89, 0.2); /* Default background */
     border-radius: var(--grid-border-radius);
+    position: relative;
+    overflow: hidden; /* Ensure content doesn't spill */
+    transition: background-color 0.2s ease;
     min-width: 0;
     min-height: 0;
 }
 
 /* Force square cells regardless of container size */
-.week::after {
+.unit::after { /* Renamed from .week::after */
     content: '';
     display: block;
     padding-bottom: 100%;
 }
 
-.week > * {
+.unit > * { /* Renamed from .week > * */
     position: absolute;
     width: 100%;
     height: 100%;
 }
 
-.week.past {
+.unit.past { /* Renamed from .week.past */
     background-color: var(--primary-color);
 }
 
 /* Phase Colors */
-.week.childhood {
-    background-color: rgba(var(--phase-childhood), 0.2);
-}
+.unit.childhood { background-color: rgba(var(--phase-childhood), 0.2); }
+.unit.adolescence { background-color: rgba(var(--phase-adolescence), 0.2); }
+.unit.early-adulthood { background-color: rgba(var(--phase-early-adulthood), 0.2); }
+.unit.middle-age { background-color: rgba(var(--phase-middle-age), 0.2); }
+.unit.late-adulthood { background-color: rgba(var(--phase-late-adulthood), 0.2); }
 
-.week.adolescence {
-    background-color: rgba(var(--phase-adolescence), 0.2);
-}
+.unit.past.childhood { background-color: rgba(var(--phase-childhood), 1); }
+.unit.past.adolescence { background-color: rgba(var(--phase-adolescence), 1); }
+.unit.past.early-adulthood { background-color: rgba(var(--phase-early-adulthood), 1); }
+.unit.past.middle-age { background-color: rgba(var(--phase-middle-age), 1); }
+.unit.past.late-adulthood { background-color: rgba(var(--phase-late-adulthood), 1); }
 
-.week.early-adulthood {
-    background-color: rgba(var(--phase-early-adulthood), 0.2);
-}
-
-.week.middle-age {
-    background-color: rgba(var(--phase-middle-age), 0.2);
-}
-
-.week.late-adulthood {
-    background-color: rgba(var(--phase-late-adulthood), 0.2);
-}
-
-.week.past.childhood {
-    background-color: rgba(var(--phase-childhood), 1);
-}
-
-.week.past.adolescence {
-    background-color: rgba(var(--phase-adolescence), 1);
-}
-
-.week.past.early-adulthood {
-    background-color: rgba(var(--phase-early-adulthood), 1);
-}
-
-.week.past.middle-age {
-    background-color: rgba(var(--phase-middle-age), 1);
-}
-
-.week.past.late-adulthood {
-    background-color: rgba(var(--phase-late-adulthood), 1);
-}
-
-/*----------------------------------------------
- * 8. EVENT MARKERS & TOOLTIPS
- *----------------------------------------------*/
 /* Event Styles */
-.week.event {
+.unit.event { /* Renamed from .week.event */
     position: relative;
     background-color: rgba(0, 163, 255, 0.2) !important; /* Using accent blue */
 }
 
-.week.event.past {
+.unit.event.past { /* Renamed from .week.event.past */
     background-color: var(--accent-blue) !important;
 }
 
-.week.event::before {
+.unit.event::before { /* Renamed from .week.event::before */
     content: '';
     position: absolute;
     top: 50%;
@@ -495,6 +506,9 @@ h1 {
     z-index: 1;
 }
 
+/*----------------------------------------------
+ * 8. EVENT MARKERS & TOOLTIPS
+ *----------------------------------------------*/
 /* Tooltip Theme */
 .tippy-box[data-theme~='custom'] {
     background-color: var(--surface);
@@ -650,7 +664,8 @@ h1 {
         width: 100%;
     }
 
-    .input-group input {
+    .input-group input,
+    .input-group select {
         /* width: 100%; */
     }
 
@@ -693,12 +708,12 @@ h1 {
         gap: calc(var(--grid-gap) / 2);
     }
     
-    .week {
+    .unit {
         border-radius: calc(var(--grid-border-radius) / 2);
     }
 
     /* Event Markers */
-    .week.event::before {
+    .unit.event::before { /* Renamed from .week.event::before */
         width: 8px;
         height: 8px;
     }
@@ -746,5 +761,5 @@ h1 {
     /* Empty - fluid typography handles this now */
     .export-frame {
         padding: var(--spacing-md);
-    }
+  }
 }
