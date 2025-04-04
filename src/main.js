@@ -430,51 +430,29 @@ async function exportImage() {
                     // Add export mode class to ensure proper styling
                     clonedExportFrame.classList.add('export-mode');
                     
-                    // Create a style element to override responsive styles
+                    // Create a minimal style element with only dynamic values
                     const styleOverride = clonedDoc.createElement('style');
                     styleOverride.textContent = `
-                        /* Force desktop styling in export mode */
+                        /* Dynamic sizing for export */
                         .export-frame.export-mode {
                             width: ${EXPORT_WIDTH}px !important;
                             height: ${EXPORT_HEIGHT}px !important;
                             padding: ${EXPORT_PADDING}px !important;
-                            box-sizing: border-box !important;
-                            transform: none !important;
-                            margin: 0 !important;
-                            max-width: none !important;
-                            max-height: none !important;
-                            --header-height: 250px !important;
-                            --footer-height: 250px !important;
                         }
                         
-                        /* Force fixed header/footer heights */
-                        .export-frame.export-mode .export-header {
-                            height: 250px !important;
-                            min-height: 250px !important;
-                            flex-shrink: 0 !important;
-                            display: flex !important;
-                            flex-direction: column !important;
-                            justify-content: flex-end !important;
-                        }
-                        
+                        /* Fixed header/footer heights */
+                        .export-frame.export-mode .export-header,
                         .export-frame.export-mode .export-footer {
                             height: 250px !important;
                             min-height: 250px !important;
-                            flex-shrink: 0 !important;
-                            display: flex !important;
-                            flex-direction: column !important;
-                            justify-content: flex-start !important;
                         }
                         
-                        /* Phase weeks and unit sizing */
-                        .export-frame.export-mode .phase-weeks {
-                            flex: none !important;
-                            display: grid !important;
-                            grid-auto-rows: 1fr !important;
-                            gap: var(--grid-gap) !important;
-                            min-height: 0 !important;
+                        /* Dynamic content wrapper height calculation */
+                        .export-frame.export-mode .content-wrapper {
+                            height: calc(${EXPORT_HEIGHT}px - (2 * ${EXPORT_PADDING}px) - 500px) !important;
                         }
                         
+                        /* Grid column configuration based on view mode */
                         .export-frame.export-mode .grid-view-weeks .phase-weeks,
                         .export-frame.export-mode .phase-weeks.view-weeks {
                             grid-template-columns: repeat(52, 1fr) !important;
@@ -490,185 +468,22 @@ async function exportImage() {
                             grid-template-columns: repeat(10, 1fr) !important;
                         }
                         
-                        .export-frame.export-mode .unit {
-                            aspect-ratio: 1/1 !important;
-                            min-width: 0 !important;
-                            min-height: 0 !important;
-                        }
-                        
-                        .export-frame.export-mode .unit::after {
-                            content: "" !important;
-                            display: block !important;
-                            padding-bottom: 100% !important;
-                        }
-                        
-                        /* Typography overrides - use non-fluid fixed sizes */
-                        .export-frame.export-mode h1 {
-                            font-size: 80px !important;
-                            line-height: 1.1 !important;
-                        }
-                        
-                        .export-frame.export-mode .tagline {
-                            font-size: 64px !important;
-                            line-height: 1.2 !important;
-                        }
-                        
-                        .export-frame.export-mode .phase-name {
-                            font-size: 14px !important;
-                        }
-                        
-                        .export-frame.export-mode .phase-duration {
-                            font-size: 12px !important;
-                        }
-                        
+                        /* Footer content styling - ensure desktop sizing */
                         .export-frame.export-mode .credits {
-                            font-size: 14px !important;
+                            font-size: ${window.getComputedStyle(document.documentElement).getPropertyValue('--font-size-md')} !important;
+                            gap: ${window.getComputedStyle(document.documentElement).getPropertyValue('--spacing-md')} !important;
+                            justify-content: center !important;
+                            align-items: center !important;
                         }
                         
-                        /* Disable any media queries */
-                        @media (max-width: 1024px) {
-                            .export-frame.export-mode {
-                                transform: none !important;
-                                margin: 0 !important;
-                            }
-                        }
-                        
-                        @media (max-width: 768px) {
-                            .export-frame.export-mode {
-                                transform: none !important;
-                                margin: 0 !important;
-                            }
+                        .export-frame.export-mode .signature {
+                            height: 48px !important;
+                            width: auto !important;
                         }
                     `;
                     
                     // Add the style element to the cloned document
                     clonedDoc.head.appendChild(styleOverride);
-                    
-                    // Force explicit dimensions and styling
-                    clonedExportFrame.style.width = `${EXPORT_WIDTH}px`;
-                    clonedExportFrame.style.height = `${EXPORT_HEIGHT}px`;
-                    clonedExportFrame.style.padding = `${EXPORT_PADDING}px`;
-                    clonedExportFrame.style.boxSizing = 'border-box';
-                    clonedExportFrame.style.display = 'flex';
-                    clonedExportFrame.style.flexDirection = 'column';
-                    clonedExportFrame.style.transform = 'none';
-                    clonedExportFrame.style.margin = '0';
-                    
-                    // Apply styles to content wrapper
-                    const contentWrapper = clonedExportFrame.querySelector('.content-wrapper');
-                    if (contentWrapper) {
-                        contentWrapper.style.flex = '1';
-                        contentWrapper.style.display = 'flex';
-                        contentWrapper.style.flexDirection = 'column';
-                        contentWrapper.style.height = `${EXPORT_HEIGHT - (2 * EXPORT_PADDING) - 500}px`; // 500px = header (250px) + footer (250px)
-                        contentWrapper.style.overflow = 'hidden';
-                    }
-                    
-                    // Apply styles to grid container
-                    const gridContainer = clonedExportFrame.querySelector('.grid-container');
-                    if (gridContainer) {
-                        gridContainer.style.flex = '1';
-                        gridContainer.style.display = 'flex';
-                        gridContainer.style.flexDirection = 'column';
-                        gridContainer.style.minHeight = '0';
-                        gridContainer.style.overflow = 'hidden';
-                        gridContainer.style.width = '100%';
-                        gridContainer.style.maxWidth = 'none';
-                        gridContainer.style.margin = '0';
-                        gridContainer.style.padding = '20px';
-                    }
-                    
-                    // Apply styles to weeks container
-                    const weeksContainer = clonedExportFrame.querySelector('.weeks-container');
-                    if (weeksContainer) {
-                        weeksContainer.style.flex = '1';
-                        weeksContainer.style.display = 'flex';
-                        weeksContainer.style.flexDirection = 'column';
-                        weeksContainer.style.minHeight = '0';
-                        weeksContainer.style.overflow = 'hidden';
-                    }
-                    
-                    // Apply styles to phase-weeks containers
-                    const phaseWeeksContainers = clonedExportFrame.querySelectorAll('.phase-weeks');
-                    phaseWeeksContainers.forEach(container => {
-                        // Remove flex: 1 and use grid properties instead
-                        container.style.flex = 'none';
-                        container.style.display = 'grid';
-                        container.style.gridAutoRows = '1fr';
-                        container.style.gap = 'var(--grid-gap)';
-                        
-                        // Keep the columns based on view mode
-                        if (container.classList.contains('view-weeks') || 
-                            container.closest('.grid-view-weeks')) {
-                            container.style.gridTemplateColumns = 'repeat(52, 1fr)';
-                        } else if (container.classList.contains('view-months') || 
-                            container.closest('.grid-view-months')) {
-                            container.style.gridTemplateColumns = 'repeat(24, 1fr)';
-                        } else if (container.classList.contains('view-years') || 
-                            container.closest('.grid-view-years')) {
-                            container.style.gridTemplateColumns = 'repeat(10, 1fr)';
-                        }
-                    });
-                    
-                    // Ensure consistent unit sizing
-                    const units = clonedExportFrame.querySelectorAll('.unit');
-                    units.forEach(unit => {
-                        unit.style.aspectRatio = '1/1';
-                        unit.style.minWidth = '0';
-                        unit.style.minHeight = '0';
-                    });
-                    
-                    // Force typography to desktop sizes
-                    const heading = clonedExportFrame.querySelector('h1');
-                    if (heading) {
-                        heading.style.fontSize = '80px';
-                        heading.style.lineHeight = '1.1';
-                        heading.style.textAlign = 'center';
-                        heading.style.marginBottom = '12px';
-                    }
-                    
-                    const tagline = clonedExportFrame.querySelector('.tagline');
-                    if (tagline) {
-                        tagline.style.fontSize = '64px';
-                        tagline.style.lineHeight = '1.2';
-                        tagline.style.textAlign = 'center';
-                    }
-                    
-                    const phaseNames = clonedExportFrame.querySelectorAll('.phase-name');
-                    phaseNames.forEach(name => {
-                        name.style.fontSize = '14px';
-                    });
-                    
-                    const phaseDurations = clonedExportFrame.querySelectorAll('.phase-duration');
-                    phaseDurations.forEach(duration => {
-                        duration.style.fontSize = '12px';
-                    });
-                    
-                    const credits = clonedExportFrame.querySelector('.credits');
-                    if (credits) {
-                        credits.style.fontSize = '14px';
-                    }
-                    
-                    // Set explicit heights for header and footer
-                    const header = clonedExportFrame.querySelector('.export-header');
-                    if (header) {
-                        header.style.height = '250px';
-                        header.style.minHeight = '250px';
-                        header.style.flexShrink = '0';
-                        header.style.display = 'flex';
-                        header.style.flexDirection = 'column';
-                        header.style.justifyContent = 'flex-end';
-                    }
-                    
-                    const footer = clonedExportFrame.querySelector('.export-footer');
-                    if (footer) {
-                        footer.style.height = '250px';
-                        footer.style.minHeight = '250px';
-                        footer.style.flexShrink = '0';
-                        footer.style.display = 'flex';
-                        footer.style.flexDirection = 'column';
-                        footer.style.justifyContent = 'flex-start';
-                    }
                 }
                 
                 // Ensure the cloned document has the same button state

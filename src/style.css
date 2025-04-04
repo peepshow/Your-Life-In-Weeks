@@ -38,7 +38,7 @@
     --phase-childhood: 255, 190, 157;    /* Soft peach */
     --phase-adolescence: 255, 166, 158;  /* Light coral */
     --phase-early-adulthood: 160, 217, 255;  /* Soft blue */
-    --phase-middle-age: 173, 255, 201;   /* Soft mint */
+    --phase-middle-age: 165, 210, 180;   /* Soft mint */
     --phase-late-adulthood: 220, 189, 251;  /* Soft lavender */
 
     /* Typography */
@@ -55,7 +55,7 @@
     
     /* Fluid Typography - Using clamp for responsive scaling */
     --fluid-title: clamp(42px, 5.8vw,80px);
-    --fluid-huge: clamp(32px, 5vw, 64px);
+    --fluid-huge: clamp(38px, 6vw, 64px);
     --fluid-xxl: clamp(24px, 4vw, 36px);
     --fluid-xl: clamp(18px, 3vw, 24px);
     --fluid-lg: clamp(14px, 1.5vw, 16px);
@@ -212,7 +212,15 @@ body {
 }
 
 .export-frame.export-mode .credits {
-    font-size: var(--font-size-md) !important; /* Fixed size instead of fluid */
+    font-size: var(--font-size-md) !important; /* Use fixed size instead of fluid */
+    gap: var(--spacing-md) !important; /* Fixed spacing */
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.export-frame.export-mode .signature {
+    height: 48px !important; /* Fixed height at desktop size */
+    width: auto !important;
 }
 
 /* Make content wrapper fill available space in export mode */
@@ -320,6 +328,15 @@ body {
     .export-frame.export-mode .phase-duration {
         font-size: var(--font-size-sm) !important;
     }
+
+    .export-frame.export-mode .credits {
+        font-size: var(--font-size-md) !important;
+        gap: var(--spacing-md) !important;
+    }
+    
+    .export-frame.export-mode .signature {
+        height: 48px !important;
+    }
 }
 
 .export-header {
@@ -334,7 +351,7 @@ body {
     margin-top: auto;
     height: var(--footer-height);
     padding-top: var(--footer-padding);
-  display: flex;
+    display: flex;
     flex-direction: column;
     justify-content: flex-start;
 }
@@ -611,11 +628,11 @@ h1 {
 }
 
 /* Phase Colors */
-.unit.childhood { background-color: rgba(var(--phase-childhood), 0.2); }
-.unit.adolescence { background-color: rgba(var(--phase-adolescence), 0.2); }
-.unit.early-adulthood { background-color: rgba(var(--phase-early-adulthood), 0.2); }
-.unit.middle-age { background-color: rgba(var(--phase-middle-age), 0.2); }
-.unit.late-adulthood { background-color: rgba(var(--phase-late-adulthood), 0.2); }
+.unit.childhood { background-color: rgba(var(--phase-childhood), 0.3); }
+.unit.adolescence { background-color: rgba(var(--phase-adolescence), 0.3); }
+.unit.early-adulthood { background-color: rgba(var(--phase-early-adulthood), 0.3); }
+.unit.middle-age { background-color: rgba(var(--phase-middle-age), 0.3); }
+.unit.late-adulthood { background-color: rgba(var(--phase-late-adulthood), 0.3); }
 
 .unit.past.childhood { background-color: rgba(var(--phase-childhood), 1); }
 .unit.past.adolescence { background-color: rgba(var(--phase-adolescence), 1); }
@@ -626,7 +643,7 @@ h1 {
 /* Event Styles */
 .unit.event { /* Renamed from .week.event */
     position: relative;
-    background-color: rgba(0, 163, 255, 0.2) !important; /* Using accent blue */
+    background-color: rgba(0, 163, 255, 0.3) !important; /* Using accent blue */
 }
 
 .unit.event.past { /* Renamed from .week.event.past */
@@ -726,7 +743,7 @@ h1 {
 }
 
 .signature {
-    height: clamp(20px, 2.5vw, 24px);
+    height: clamp(28px, 2.5vw, 48px);
     width: auto;
 }
 
@@ -895,6 +912,11 @@ h1 {
         bottom: 0;
         z-index: 2;
     }
+    .credits {
+        font-size: var(--fluid-md);
+        gap: var(--spacing-md);
+        }
+    
 }
 
 /* Small Mobile Layout (≤480px) */
@@ -903,4 +925,24 @@ h1 {
     .export-frame {
         padding: var(--spacing-md);
   }
+  .credits {
+    font-size: var(--fluid-md);
+    gap: var(--spacing-xs);
+    }
+}
+
+/* Grid column configuration based on view mode */
+.export-frame.export-mode .grid-view-weeks .phase-weeks,
+.export-frame.export-mode .phase-weeks.view-weeks {
+    grid-template-columns: repeat(52, 1fr) !important;
+}
+
+.export-frame.export-mode .grid-view-months .phase-weeks,
+.export-frame.export-mode .phase-weeks.view-months {
+    grid-template-columns: repeat(24, 1fr) !important;
+}
+
+.export-frame.export-mode .grid-view-years .phase-weeks,
+.export-frame.export-mode .phase-weeks.view-years {
+    grid-template-columns: repeat(10, 1fr) !important;
 }
