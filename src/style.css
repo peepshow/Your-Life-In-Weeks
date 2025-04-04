@@ -1,15 +1,24 @@
-/* Custom Font */
+/*******************************************************
+ * Life in Weeks CSS
+ * A responsive visualization of life in weeks
+ *******************************************************/
+
+/*----------------------------------------------
+ * 1. FONTS & TYPOGRAPHY
+ *----------------------------------------------*/
 @font-face {
     font-family: 'AmsiPro';
     src: url('/fonts/AmsiPro-Bold.woff2') format('woff2'),
-        url('/fonts/AmsiPro-Bold.woff') format('woff'),
-        url('/fonts/AmsiPro-Bold.ttf') format('truetype');
+         url('/fonts/AmsiPro-Bold.woff') format('woff'),
+         url('/fonts/AmsiPro-Bold.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
 }
 
-/* Variables */
+/*----------------------------------------------
+ * 2. VARIABLES
+ *----------------------------------------------*/
 :root {
     /* Colors */
     --primary-color: #ff7673;
@@ -22,6 +31,9 @@
     --text-secondary: #666666;
     --border: #e0e0e0;
 
+    /* Gradients */
+    --primary-gradient: linear-gradient(180deg, #FFC97D 0%, #FF7673 100%);
+
     /* Phase Colors */
     --phase-childhood: 255, 190, 157;    /* Soft peach */
     --phase-adolescence: 255, 166, 158;  /* Light coral */
@@ -32,6 +44,22 @@
     /* Typography */
     --heading-font: 'AmsiPro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --body-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-size-xs: 10px;
+    --font-size-sm: 12px;
+    --font-size-md: 14px;
+    --font-size-lg: 16px;
+    --font-size-xl: 24px;
+    --font-size-xxl: 36px;
+    --font-size-huge: 48px;
+    --font-size-title: 72px;
+    
+    /* Fluid Typography - Using clamp for responsive scaling */
+    --fluid-title: clamp(42px, 6vw, 72px);
+    --fluid-huge: clamp(28px, 5vw, 48px);
+    --fluid-xxl: clamp(24px, 4vw, 36px);
+    --fluid-xl: clamp(18px, 3vw, 24px);
+    --fluid-lg: clamp(14px, 1.5vw, 16px);
+    --fluid-md: clamp(12px, 1.2vw, 14px);
 
     /* Spacing */
     --spacing-xs: 8px;
@@ -40,18 +68,53 @@
     --spacing-lg: 24px;
     --spacing-xl: 32px;
     --spacing-xxl: 48px;
+    /* Smaller Fluid Spacing */
+
+
+    /* Fluid Spacing */
+    --fluid-spacing-xs: clamp(6px, 0.8vw, 8px);
+    --fluid-spacing-sm: clamp(8px, 1.2vw, 12px);
+    --fluid-spacing-md: clamp(16px, 2vw, 20px);
+    --fluid-spacing-lg: clamp(20px, 2.5vw, 24px);
+    --fluid-spacing-xl: clamp(20px, 3vw, 32px);
+    --fluid-spacing-xxl: clamp(32px, 5vw, 48px);
 
     /* Border Radius */
+    --radius-xs: 2px;
     --radius-sm: 6px;
     --radius-md: 8px;
     --radius-lg: 12px;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    /* Export Frame */
+    --export-width: 1080px;
+    --export-height: 1920px;
+    --header-height: auto;
+    --footer-height: auto;
+    --header-padding: var(--fluid-spacing-sm);
+    --footer-padding: var(--fluid-spacing-sm);
+    
+    /* Grid */
+    --grid-gap: 1px;
+    --grid-border-radius: 1px;
 }
 
-/* Reset & Base Styles */
+/*----------------------------------------------
+ * 3. RESET & BASE STYLES
+ *----------------------------------------------*/
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html, body {
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    width: 100%;
+    position: relative;
 }
 
 body {
@@ -63,34 +126,125 @@ body {
     line-height: 1.5;
 }
 
+/*----------------------------------------------
+ * 4. LAYOUT
+ *----------------------------------------------*/
 /* App Container */
 .app-container {
-    max-width: 1080px;
+    max-width: 100%;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+}
+
+/* Export Frame Container */
+.export-frame-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Export Frame */
+.export-frame {
+    background: var(--primary-gradient);
+    width: var(--export-width);
+    padding: var(--spacing-xxl);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    transform-origin: top center;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    gap: var(--spacing-xs);
+    padding: 0;
+}
+
+/* Export mode class for PNG capture */
+.export-frame.export-mode {
+    --header-height: 250px;
+    --footer-height: 250px;
+    --header-padding: 0;
+    --footer-padding: 0;
+    padding: var(--spacing-xxl);
+    border-radius: 0;
+}
+
+.export-header {
+    display: flex;
+    flex-direction: column;
+    height: var(--header-height);
+    justify-content: flex-end;
+    padding-bottom: var(--header-padding);
+}
+
+.export-footer {
+    margin-top: auto;
+    height: var(--footer-height);
+    padding-top: var(--footer-padding);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/*----------------------------------------------
+ * 5. TYPOGRAPHY
+ *----------------------------------------------*/
+h1 {
+    font-family: var(--heading-font);
+    color: var(--text-primary);
+    font-size: var(--fluid-title);
+    line-height: 1.1;
+    text-align: center;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    margin-bottom: var(--spacing-sm);
+}
+
+.tagline {
+    font-family: var(--heading-font);
+    color: var(--surface);
+    font-size: var(--fluid-huge);
+    line-height: 1.2;
+    margin-bottom: var(--fluid-spacing-xs);
+    text-align: center;
+}
+
+/*----------------------------------------------
+ * 6. TOOLBAR COMPONENTS
+ *----------------------------------------------*/
+.toolbar {
+    background-color: var(--surface);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
 }
 
-/* Toolbar Section */
-.toolbar {
-    background-color: var(--surface);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+.input-section {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: var(--spacing-md);
 }
 
-.input-section {
+.controls-section {
     display: flex;
-    gap: var(--spacing-xl);
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: var(--spacing-md);
 }
 
+/* Input Groups */
 .input-group {
     display: flex;
     flex-direction: column;
@@ -99,7 +253,7 @@ body {
 }
 
 .input-group label {
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     font-weight: 600;
     color: var(--text-secondary);
     letter-spacing: 0.05em;
@@ -109,16 +263,9 @@ body {
     padding: var(--spacing-xs) var(--spacing-sm);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    font-size: 14px;
+    font-size: var(--font-size-md);
     color: var(--text-primary);
     width: 140px;
-}
-
-.controls-section {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
-    flex-wrap: wrap;
 }
 
 /* Toggle Switch */
@@ -160,7 +307,7 @@ body {
 }
 
 .toggle-label {
-    font-size: 14px;
+    font-size: var(--font-size-md);
     color: var(--text-secondary);
 }
 
@@ -171,7 +318,7 @@ body {
     border: none;
     border-radius: 50px;
     padding: 10px var(--spacing-md);
-    font-size: 14px;
+    font-size: var(--font-size-md);
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
@@ -181,185 +328,84 @@ body {
     background-color: var(--accent-blue-hover);
 }
 
-/* Export Frame */
-.export-frame {
-    background-color: var(--surface);
-    width: 1080px;
-    height: 1920px;
-    margin: 0 auto;
-    padding: var(--spacing-md);
-    border-radius: var(--radius-md);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-}
-
-/* Add a container for the export frame to handle responsiveness */
-.export-frame-container {
-    width: 100%;
-    max-width: 1080px;
-    margin: 0 auto;
-    transform-origin: top center;
-}
-
-@media screen and (max-width: 1080px) {
-    .export-frame-container {
-        transform: scale(calc(100vw / 1080));
-        height: calc(1920px * (100vw / 1080));
-        margin-bottom: -200px; /* Adjust based on your needs */
-    }
-}
-
-.content-wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    gap: var(--spacing-xs);
-}
-
-/* Title */
-h1 {
-    font-family: var(--heading-font);
-    color: var(--text-primary);
-    font-size: 64px;
-    line-height: 64px;
-    text-align: center;
-    flex-shrink: 0;
-    margin-bottom: var(--spacing-sm);
-}
-
+/*----------------------------------------------
+ * 7. GRID COMPONENTS
+ *----------------------------------------------*/
 /* Grid Container */
 .grid-container {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
+    background-color: var(--background);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    aspect-ratio: 52/80; /* Approximate aspect ratio for 80 years of 52 weeks */
+    max-width: 960px;
+    margin: 0 auto;
+    overflow: hidden; /* Prevent overflow */
 }
 
+/* Grid Structure */
 .phases-and-grid {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    min-height: 0;
+    gap: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden; /* Prevent overflow */
 }
 
 .weeks-container {
-    flex: 1;
-    display: grid;
-    grid-template-rows: repeat(auto-fit, min-content);
-    gap: 4px;
-    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden; /* Prevent overflow */
 }
 
-/* Week Styles */
 .phase-weeks {
     display: grid;
     grid-template-columns: repeat(52, 1fr);
-    gap: 1px;
+    grid-auto-rows: 1fr;
+    gap: var(--grid-gap);
+    min-height: 0; /* Allow flex container to shrink */
+    margin-bottom: var(--grid-gap);
 }
 
+/* Apply flex: 1 only in default view (without phases) */
+.default-view .phase-weeks {
+    flex: 1;
+}
+
+/* Week Cell Styles */
 .week {
-    width: 100%;
-    height: 100%;
+    position: relative;
     background-color: rgba(255, 140, 89, 0.2);
     transition: background-color 0.2s ease;
+    border-radius: var(--grid-border-radius);
+    min-width: 0;
+    min-height: 0;
+}
+
+/* Force square cells regardless of container size */
+.week::after {
+    content: '';
+    display: block;
+    padding-bottom: 100%;
+}
+
+.week > * {
+    position: absolute;
+    width: 100%;
+    height: 100%;
 }
 
 .week.past {
     background-color: var(--primary-color);
 }
 
-/* Event Styles */
-.week.event {
-    position: relative;
-    background-color: rgba(0, 163, 255, 0.2) !important; /* Using accent blue */
-}
-
-.week.event.past {
-    background-color: var(--accent-blue) !important;
-}
-
-.week.event::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 6px;
-    height: 6px;
-    background-color: #ffffff;
-    border-radius: 50%;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
-}
-
-/* Mobile Tooltip Styles */
-@media (max-width: 768px) {
-    .week.event::after {
-        width: 8px;
-        height: 8px;
-    }
-
-    /* Increase tap target size */
-    .week.event::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 24px;
-        height: 24px;
-        background: transparent;
-        z-index: 1;
-    }
-}
-
-/* Tooltip Theme */
-.tippy-box[data-theme~='custom'] {
-    background-color: var(--surface);
-    color: var(--text-primary);
-    border-radius: var(--radius-md);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    padding: var(--spacing-xs);
-}
-
-.tippy-box[data-theme~='custom'] .tippy-arrow {
-    color: var(--surface);
-}
-
-.event-tooltip {
-    padding: var(--spacing-xs);
-}
-
-.event-title {
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-
-.event-date {
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-
-@media (max-width: 768px) {
-    .event-tooltip {
-        padding: var(--spacing-sm);
-    }
-
-    .event-title {
-        font-size: 16px;
-        margin-bottom: 6px;
-    }
-
-    .event-date {
-        font-size: 14px;
-    }
-}
-
-/* Phase Styles */
+/* Phase Colors */
 .week.childhood {
     background-color: rgba(var(--phase-childhood), 0.2);
 }
@@ -400,64 +446,172 @@ h1 {
     background-color: rgba(var(--phase-late-adulthood), 1);
 }
 
-/* Phase Separator */
+/*----------------------------------------------
+ * 8. EVENT MARKERS & TOOLTIPS
+ *----------------------------------------------*/
+/* Event Styles */
+.week.event {
+    position: relative;
+    background-color: rgba(0, 163, 255, 0.2) !important; /* Using accent blue */
+}
+
+.week.event.past {
+    background-color: var(--accent-blue) !important;
+}
+
+.week.event::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background-color: var(--surface);
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+/* Tooltip Theme */
+.tippy-box[data-theme~='custom'] {
+    background-color: var(--surface);
+    color: var(--text-primary);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-xs);
+}
+
+.tippy-box[data-theme~='custom'] .tippy-arrow {
+    color: var(--surface);
+}
+
+.event-tooltip {
+    padding: var(--spacing-xs);
+}
+
+.event-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.event-date {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/*----------------------------------------------
+ * 9. PHASE SEPARATORS
+ *----------------------------------------------*/
 .phase-separator {
     width: 100%;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding: 0;
-    margin: 0;
+    padding: var(--spacing-xs) 0 0 0;
     flex-shrink: 0;
 }
 
 .phase-info {
     display: flex;
-    align-items: baseline;
-    gap: var(--spacing-xs);
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
 .phase-name {
-    font-family: var(--heading-font);
+    font-weight: 600;
+    font-size: var(--fluid-md);
     color: var(--text-primary);
-    font-size: 14px;
-    font-weight: 900;
 }
 
 .phase-duration {
+    font-size: var(--font-size-sm);
     color: var(--text-secondary);
-    font-size: 14px;
 }
 
-/* Footer */
-.export-footer {
-    margin-top: auto;
-    padding-top: var(--spacing-sml);
-    flex-shrink: 0;
-    height: 96px;
+/* Adjust spacing for phase separators in weeks container */
+.weeks-container .phase-separator {
+    margin-top: 2px;
+    margin-bottom: 2px;
 }
 
-.tagline {
-    font-family: var(--heading-font);
-    color: var(--primary-color);
-    font-size: 48px;
-    margin-bottom:0;
-    text-align: center;
-}
-
+/*----------------------------------------------
+ * 10. FOOTER COMPONENTS
+ *----------------------------------------------*/
 .credits {
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: var(--text-primary);
-    font-size: 14px;
+    font-size: var(--fluid-md);
 }
 
 .signature {
-    height: 24px;
+    height: clamp(20px, 2.5vw, 24px);
     width: auto;
 }
 
-@media screen and (max-width: 768px) {
+/*----------------------------------------------
+ * 11. RESPONSIVE STYLES
+ *----------------------------------------------*/
+/* Desktop Layout (≥1024px) */
+@media (min-width: 1024px) {
+    body {
+        padding: var(--spacing-xl);
+    }
+
+    .app-container {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: var(--spacing-xl);
+        padding: 0;
+    }
+
+    .toolbar {
+        width: 300px;
+        position: sticky;
+        top: var(--spacing-xl);
+    }
+
+    .export-frame-container {
+        flex: 1;
+        min-width: 0; /* Prevent flex item from overflowing */
+    }
+
+    .input-section,
+    .controls-section {
+        width: 100%;
+    }
+
+    .toggle {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* Tablet Layout (<1024px) */
+@media (max-width: 1024px) {
+    .export-frame {
+        transform: scale(calc(100vw / 1080));
+        margin-bottom: calc(-1920px + (1920px * (100vw / 1080)));
+        padding: var(--spacing-xxl);
+    }
+}
+
+/* Mobile Layout (≤768px) */
+@media (max-width: 768px) {
+    /* General Layout */
+    body {
+        padding: var(--spacing-xs);
+    }
+
+    .app-container {
+        gap: var(--spacing-sm);
+        padding: var(--spacing-xs);
+    }
+
+    /* Toolbar */
     .toolbar {
         flex-direction: column;
         align-items: stretch;
@@ -492,54 +646,79 @@ h1 {
         padding: var(--spacing-sm) var(--spacing-md);
     }
 
-    body {
-        padding: var(--spacing-xs);
-    }
-
-    .app-container {
-        gap: var(--spacing-sm);
-    }
-
-    /* Scale down the export frame container while maintaining aspect ratio */
+    /* Export Frame */
     .export-frame-container {
-        width: 100vw;
-        margin-left: calc(-1 * var(--spacing-xs));
-        margin-right: calc(-1 * var(--spacing-xs));
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
     }
 
     .export-frame {
         transform-origin: top center;
-        transform: scale(calc(100vw / 1080));
-        margin-bottom: calc(-1920px + (1920px * (100vw / 1080)));
+        transform: scale(calc(min(100vw, 100%) / 1080));
+        margin-bottom: calc(-1920px + (1920px * (min(100vw, 100%) / 1080)));
+        padding: var(--spacing-xl);
     }
 
-    /* Adjust title size for mobile */
-    h1 {
-        font-size: 48px;
-        line-height: 48px;
+    /* Grid */
+    .grid-container {
+        padding: var(--spacing-sm);
+        border-radius: 12px;
+    }
+    
+    .phase-weeks {
+        gap: 0.5px;
+    }
+    
+    .week {
+        border-radius: 0.5px;
     }
 
-    /* Adjust footer for mobile */
-    .tagline {
-        font-size: 36px;
+    /* Event Markers */
+    .week.event::before {
+        width: 8px;
+        height: 8px;
     }
 
-    .credits {
-        font-size: 12px;
+    /* Tooltip Content */
+    .event-tooltip {
+        padding: var(--spacing-sm);
     }
 
-    .signature {
-        height: 20px;
+    .event-title {
+        font-size: var(--fluid-lg);
+        margin-bottom: 6px;
+    }
+
+    .event-date {
+        font-size: var(--fluid-md);
+    }
+
+    /* Phase Labels */
+    .phase-separator {
+        padding: 4px 6px;
+    }
+    
+    .phase-name {
+        font-size: var(--fluid-md);
+    }
+    
+    .phase-duration {
+        font-size: var(--font-size-xs);
+    }
+
+    /* Week Interaction Area */
+    .week-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 2;
     }
 }
 
-@media screen and (max-width: 480px) {
-    h1 {
-        font-size: 36px;
-        line-height: 36px;
-    }
-
-    .tagline {
-        font-size: 28px;
-    }
+/* Small Mobile Layout (≤480px) */
+@media (max-width: 480px) {
+    /* Empty - fluid typography handles this now */
 }

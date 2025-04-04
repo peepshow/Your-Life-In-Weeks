@@ -184,6 +184,11 @@ function createWeekElement(weekIndex, weeksPassed, birthDate) {
                 </div>`;
             }).join('');
             
+            // Create content container for absolute positioning
+            const contentContainer = document.createElement('div');
+            contentContainer.className = 'week-content';
+            weekElement.appendChild(contentContainer);
+            
             tippy(weekElement, {
                 content: eventDetails,
                 allowHTML: true,
@@ -216,13 +221,17 @@ function renderGrid(weeksPassed, totalWeeks, birthDate) {
     
     // Clear previous grid and tooltips
     elements.weeksGrid.innerHTML = '';
-    if (elements.weeksGrid._tippyInstances) {
-        elements.weeksGrid._tippyInstances.forEach(instance => instance.destroy());
-    }
+    const oldTippyInstances = document.querySelectorAll('[data-tippy-root]');
+    oldTippyInstances.forEach(instance => instance._tippy && instance._tippy.destroy());
 
     // Create containers
     const phasesAndGrid = document.createElement('div');
     phasesAndGrid.className = 'phases-and-grid';
+    
+    // Add default-view class if phases are not enabled
+    if (!elements.showPhasesToggle.checked) {
+        phasesAndGrid.classList.add('default-view');
+    }
 
     const weeksContainer = document.createElement('div');
     weeksContainer.className = 'weeks-container';
@@ -246,24 +255,37 @@ function renderGrid(weeksPassed, totalWeeks, birthDate) {
                     weeksContainer.appendChild(createPhaseWeeksContainer(currentPhaseWeeks));
                     currentPhaseWeeks = [];
                 }
-
-                // Add new phase separator
+                
+                // Create and add phase separator directly to the weeks container
+                if (phaseIndex >= 0) {
+                    const phaseSeparator = createPhaseSeparator(lifePhases[phaseIndex]);
+                    weeksContainer.appendChild(phaseSeparator);
+                }
+                
                 currentPhaseIndex = phaseIndex;
-                weeksContainer.appendChild(createPhaseSeparator(lifePhases[phaseIndex]));
             }
+            
+            currentPhaseWeeks.push(weekElement);
+        } else {
+            // If phases are disabled, group weeks by year for better organization
+            if (i % WEEKS_IN_YEAR === 0 && i > 0 && currentPhaseWeeks.length > 0) {
+                weeksContainer.appendChild(createPhaseWeeksContainer(currentPhaseWeeks));
+                currentPhaseWeeks = [];
+            }
+            
+            currentPhaseWeeks.push(weekElement);
         }
-
-        currentPhaseWeeks.push(weekElement);
     }
-
+    
     // Add any remaining weeks
     if (currentPhaseWeeks.length > 0) {
         weeksContainer.appendChild(createPhaseWeeksContainer(currentPhaseWeeks));
     }
-
-    // Assemble and add to DOM
+    
     phasesAndGrid.appendChild(weeksContainer);
     elements.weeksGrid.appendChild(phasesAndGrid);
+    
+    console.log(`Grid rendered: ${weeksPassed} weeks passed out of ${totalWeeks} total weeks (${lifespan} years)`);
 }
 
 /**
@@ -271,46 +293,63 @@ function renderGrid(weeksPassed, totalWeeks, birthDate) {
  * @returns {Promise<void>}
  */
 async function exportImage() {
+    const exportFrame = document.getElementById('exportFrame');
+    const saveButton = document.querySelector('.save-button');
+    
     try {
-        // Show loading state
-        const originalText = elements.saveButton.textContent;
-        elements.saveButton.textContent = 'Exporting...';
-        elements.saveButton.disabled = true;
-
-        // Capture the export frame
-        const canvas = await html2canvas(elements.exportFrame, {
-            width: EXPORT_WIDTH,
-            height: EXPORT_HEIGHT,
-            scale: 2, // Render at 2x for better quality
+        // Disable save button and show loading state
+        saveButton.disabled = true;
+        saveButton.textContent = 'Saving...';
+        
+        // Wait for button state to be rendered
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        
+        // Add export mode class for correct dimensions
+        exportFrame.classList.add('export-mode');
+        
+        // Wait for export mode to be applied
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        
+        // Capture the frame
+        const canvas = await html2canvas(exportFrame, {
+            width: 1080,
+            height: 1920,
+            scale: 2, // Higher quality
             useCORS: true,
-            backgroundColor: '#ffffff',
-            logging: false,
+            backgroundColor: null, // Preserve transparency
+            logging: true, // Enable logging for debugging
+            onclone: (clonedDoc) => {
+                // Ensure the cloned document has the same button state
+                const clonedButton = clonedDoc.querySelector('.save-button');
+                if (clonedButton) {
+                    clonedButton.disabled = true;
+                    clonedButton.textContent = 'Saving...';
+                }
+            }
         });
-
-        // Convert to blob
-        const blob = await new Promise(resolve => {
-            canvas.toBlob(resolve, 'image/png', 1.0);
-        });
-
-        // Create download link
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'my-life-in-weeks.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-
-        // Reset button state
-        elements.saveButton.textContent = originalText;
-        elements.saveButton.disabled = false;
+        
+        // Remove export mode class
+        exportFrame.classList.remove('export-mode');
+        
+        // Convert to blob and download
+        canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = 'my-life-in-weeks.png';
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+            
+            // Reset button state
+            saveButton.disabled = false;
+            saveButton.textContent = 'SAVE A COPY';
+        }, 'image/png');
+        
     } catch (error) {
-        console.error('Error exporting image:', error);
-        alert('Failed to export image. Please try again.');
-        // Reset button state
-        elements.saveButton.textContent = originalText;
-        elements.saveButton.disabled = false;
+        console.error('Export failed:', error);
+        saveButton.disabled = false;
+        saveButton.textContent = 'SAVE A COPY';
+        exportFrame.classList.remove('export-mode');
     }
 }
 
