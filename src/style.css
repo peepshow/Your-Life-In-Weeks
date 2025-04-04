@@ -248,16 +248,20 @@ h1 {
 /* Input Groups */
 .input-group {
     display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    min-width: 140px;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    width: 100%;
 }
 
 .input-group label {
+    font-family: var(--heading-font);
     font-size: var(--font-size-sm);
-    font-weight: 600;
-    color: var(--text-secondary);
+    font-weight: bold;
+    color: var(--text-primary);
+    text-transform: uppercase;
     letter-spacing: 0.05em;
+    order: 1;
 }
 
 .input-group input {
@@ -267,16 +271,28 @@ h1 {
     font-size: var(--font-size-md);
     color: var(--text-primary);
     width: 140px;
+    order: 2;
+    transition: border-color 0.2s;
 }
 
-/* Toggle Switch */
+.input-group input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+
+/* Toggle */
 .toggle {
     display: flex;
     align-items: center;
-    gap: var(--spacing-xs);
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    cursor: pointer;
+    user-select: none;
+    width: 100%;
 }
 
 .toggle input[type="checkbox"] {
+    order: 2;
     appearance: none;
     width: 40px;
     height: 24px;
@@ -308,8 +324,13 @@ h1 {
 }
 
 .toggle-label {
-    font-size: var(--font-size-md);
-    color: var(--text-secondary);
+    font-family: var(--heading-font);
+    font-size: var(--font-size-sm);
+    font-weight: bold;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    order: 1;
 }
 
 /* Save Button */
@@ -630,7 +651,7 @@ h1 {
     }
 
     .input-group input {
-        width: 100%;
+        /* width: 100%; */
     }
 
     .controls-section {
