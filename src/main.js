@@ -499,7 +499,7 @@ async function exportImage() {
                         
                         .export-frame.export-mode .credits {
                             gap: ${window.getComputedStyle(document.documentElement).getPropertyValue('--spacing-md')} !important;
-                            justify-content: space-between !important;
+                            justify-content: center !important;
                             align-items: center !important;
                             width: 100% !important;
                             display: flex !important;
