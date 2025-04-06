@@ -806,6 +806,10 @@ h2 {
 @media (min-width: 1024px) {
     body {
         padding: 0;
+        /* Allow scrolling, remove height limit */
+        height: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 
     .app-container {
@@ -813,17 +817,31 @@ h2 {
         align-items: flex-start;
         gap: var(--spacing-xl);
         padding: var(--spacing-xl);
+        min-height: 100vh;
+        max-height: 120vh; /* Allow up to 120vh as requested */
+        overflow-y: auto; /* Allow vertical scrolling if needed */
     }
 
     .toolbar {
         width: 300px;
         position: sticky;
         top: var(--spacing-xl);
+        /* Simplify - automatically size based on content */
+        max-height: calc(100vh - var(--spacing-xl));
+        overflow-y: auto;
     }
 
     .export-frame-container {
         flex: 1;
         min-width: 0; /* Prevent flex item from overflowing */
+        /* Allow content to flow naturally */
+        overflow: visible;
+    }
+
+    .export-frame {
+        /* Scale based on container width rather than viewport */
+        transform: scale(calc(min(1, 100% / 1080)));
+        transform-origin: top center;
     }
 
     .input-section,
