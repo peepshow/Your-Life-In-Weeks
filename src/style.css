@@ -54,7 +54,7 @@
     --font-size-title: 80px;
     
     /* Fluid Typography - Using clamp for responsive scaling */
-    --fluid-title: clamp(42px, 5.8vw,80px);
+    --fluid-title: clamp(42px, 5.8vw, 72px);
     --fluid-huge: clamp(38px, 6vw, 64px);
     --fluid-xxl: clamp(24px, 4vw, 36px);
     --fluid-xl: clamp(18px, 3vw, 24px);
@@ -121,7 +121,6 @@ body {
     font-family: var(--body-font);
     background-color: var(--background);
     color: var(--text-primary);
-    min-height: 100vh;
     padding: 0;
     line-height: 1.5;
 }
@@ -131,7 +130,7 @@ body {
  *----------------------------------------------*/
 /* App Container */
 .app-container {
-    max-width: 1440px;
+    max-width: 1280px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -806,10 +805,7 @@ h2 {
 @media (min-width: 1024px) {
     body {
         padding: 0;
-        /* Allow scrolling, remove height limit */
-        height: auto;
-        overflow-x: hidden;
-        overflow-y: auto;
+        overflow: hidden;
     }
 
     .app-container {
@@ -817,31 +813,18 @@ h2 {
         align-items: flex-start;
         gap: var(--spacing-xl);
         padding: var(--spacing-xl);
-        min-height: 100vh;
-        max-height: 120vh; /* Allow up to 120vh as requested */
-        overflow-y: auto; /* Allow vertical scrolling if needed */
+        overflow: hidden;
     }
 
     .toolbar {
         width: 300px;
-        position: sticky;
-        top: var(--spacing-xl);
-        /* Simplify - automatically size based on content */
-        max-height: calc(100vh - var(--spacing-xl));
-        overflow-y: auto;
     }
 
     .export-frame-container {
         flex: 1;
         min-width: 0; /* Prevent flex item from overflowing */
-        /* Allow content to flow naturally */
-        overflow: visible;
-    }
-
-    .export-frame {
-        /* Scale based on container width rather than viewport */
-        transform: scale(calc(min(1, 100% / 1080)));
-        transform-origin: top center;
+        overflow: hidden;
+        max-height: calc(140vh - 2 * var(--spacing-xl));
     }
 
     .input-section,
