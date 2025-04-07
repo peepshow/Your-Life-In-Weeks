@@ -54,7 +54,7 @@
     --font-size-title: 80px;
     
     /* Fluid Typography - Using clamp for responsive scaling */
-    --fluid-title: clamp(42px, 5.8vw, 72px);
+    --fluid-title: clamp(42px, 5.8vw,80px);
     --fluid-huge: clamp(38px, 6vw, 64px);
     --fluid-xxl: clamp(24px, 4vw, 36px);
     --fluid-xl: clamp(18px, 3vw, 24px);
@@ -69,7 +69,6 @@
     --spacing-xl: 32px;
     --spacing-xxl: 48px;
     /* Smaller Fluid Spacing */
-
 
     /* Fluid Spacing */
     --fluid-spacing-xs: clamp(6px, 0.8vw, 8px);
@@ -92,14 +91,19 @@
     /* Export Frame */
     --export-width: 1080px;
     --export-height: 1920px;
-    --header-height: auto;
-    --footer-height: auto;
-    --header-padding: var(--fluid-spacing-sm);
-    --footer-padding: var(--fluid-spacing-sm);
+    --export-padding: 48px;
+    --export-header-height: 250px;
+    --export-footer-height: 250px;
+    --export-content-height: calc(var(--export-height) - (2 * var(--export-padding)) - var(--export-header-height) - var(--export-footer-height));
     
     /* Grid */
     --grid-gap: 1px;
     --grid-border-radius: 1px;
+    
+    /* Grid columns by view mode */
+    --grid-columns-weeks: 52;
+    --grid-columns-months: 24;
+    --grid-columns-years: 10;
 }
 
 /*----------------------------------------------
@@ -171,14 +175,13 @@ body {
 
 /* Export mode styles for consistent output across all devices */
 .export-frame.export-mode {
-    --header-height: 250px;
-    --footer-height: 250px;
-    --header-padding: 0;
-    --footer-padding: 0;
-    padding: var(--spacing-xxl);
-    border-radius: 0;
+    /* Fixed dimensions */
     width: var(--export-width) !important;
     height: var(--export-height) !important;
+    padding: var(--export-padding) !important;
+    
+    /* Reset responsive styles */
+    border-radius: 0;
     max-width: none;
     max-height: none;
     min-width: var(--export-width);
@@ -186,36 +189,82 @@ body {
     box-sizing: border-box;
     position: relative;
     overflow: hidden;
+    
     /* Reset transform properties from responsive styles */
     transform: none !important;
     margin: 0 !important;
 }
 
+/* Header and Footer spacing in export mode */
+.export-frame.export-mode .export-header {
+    flex-shrink: 0 !important;
+    margin-bottom: var(--spacing-md) !important;
+    height: var(--export-header-height) !important;
+    min-height: var(--export-header-height) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+}
+
+.export-frame.export-mode .export-footer {
+    flex-shrink: 0 !important;
+    margin-top: var(--spacing-md) !important;
+    height: var(--export-footer-height) !important;
+    min-height: var(--export-footer-height) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    padding: 0 !important;
+}
+
 /* Ensure consistent typography in export mode - override fluid typography */
 .export-frame.export-mode h1 {
-    font-size: var(--font-size-title) !important; /* Fixed size instead of fluid */
+    font-size: var(--font-size-title) !important;
     line-height: 1.1 !important;
 }
 
 .export-frame.export-mode .tagline {
-    font-size: var(--font-size-huge) !important; /* Fixed size instead of fluid */
+    padding: var(--spacing-sm) 0 0 0 !important;
+    font-size: var(--font-size-huge) !important;
     line-height: 1.2 !important;
 }
 
+.export-frame.export-mode .tagline h2 {
+    font-size: var(--font-size-huge) !important;
+    line-height: 1 !important;
+    margin-bottom: 0 !important;
+    text-align: center !important;
+    color: var(--surface) !important;
+}
+
+/* Make content wrapper fill available space in export mode */
+.export-frame.export-mode .content-wrapper {
+    flex: 1 !important;
+    min-height: 0;
+    display: flex !important;
+    flex-direction: column !important;
+    height: var(--export-content-height) !important;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Phase separators in export mode */
 .export-frame.export-mode .phase-name {
-    font-size: var(--font-size-md) !important; /* Fixed size instead of fluid */
+    font-size: var(--font-size-md) !important;
 }
 
 .export-frame.export-mode .phase-duration {
-    font-size: var(--font-size-sm) !important; /* Fixed size instead of fluid */
+    font-size: var(--font-size-sm) !important;
 }
 
+/* Footer styling in export mode */
 .export-frame.export-mode .credits {
     gap: var(--spacing-md) !important;
     justify-content: center !important;
     display: flex !important;
     width: 100% !important;
     align-items: center !important;
+    padding: 0 var(--spacing-md) !important;
 }
 
 .export-frame.export-mode .credits span {
@@ -225,23 +274,19 @@ body {
     font-family: var(--heading-font) !important;
 }
 
+.export-frame.export-mode .logo {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding-top: var(--spacing-sm) !important;
+}
+
 .export-frame.export-mode .signature {
-    height: 48px !important; /* Fixed height at desktop size */
+    height: 48px !important;
     width: auto !important;
 }
 
-/* Make content wrapper fill available space in export mode */
-.export-frame.export-mode .content-wrapper {
-    flex: 1 !important;
-    min-height: 0;
-    display: flex !important;
-    flex-direction: column !important;
-    height: calc(var(--export-height) - (2 * var(--spacing-xxl)) - 500px) !important; /* Account for export frame padding and header/footer heights (500px total) */
-    overflow: hidden;
-    position: relative;
-}
-
-/* Ensure the grid container expands to fill available space between header and footer in export mode */
+/* Grid styling in export mode */
 .export-frame.export-mode .grid-container {
     flex: 1 !important;
     display: flex !important;
@@ -254,7 +299,6 @@ body {
     padding: var(--spacing-md) !important;
 }
 
-/* Ensure weeks container and phase-weeks containers expand in export mode */
 .export-frame.export-mode .weeks-container {
     flex: 1 !important;
     min-height: 0;
@@ -271,6 +315,22 @@ body {
     gap: var(--grid-gap) !important;
 }
 
+/* Grid column configuration based on view mode */
+.export-frame.export-mode .grid-view-weeks .phase-weeks,
+.export-frame.export-mode .phase-weeks.view-weeks {
+    grid-template-columns: repeat(var(--grid-columns-weeks), 1fr) !important;
+}
+
+.export-frame.export-mode .grid-view-months .phase-weeks,
+.export-frame.export-mode .phase-weeks.view-months {
+    grid-template-columns: repeat(var(--grid-columns-months), 1fr) !important;
+}
+
+.export-frame.export-mode .grid-view-years .phase-weeks,
+.export-frame.export-mode .phase-weeks.view-years {
+    grid-template-columns: repeat(var(--grid-columns-years), 1fr) !important;
+}
+
 /* Ensure consistent cell sizing in export mode */
 .export-frame.export-mode .unit {
     aspect-ratio: 1/1 !important;
@@ -284,86 +344,14 @@ body {
     padding-bottom: 100% !important;
 }
 
-.export-frame.export-mode .export-header {
-    flex-shrink: 0 !important;
-    margin-bottom: var(--spacing-md) !important;
-    height: var(--header-height) !important;
-    min-height: var(--header-height) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-end !important;
-}
-
-.export-frame.export-mode .export-footer {
-    flex-shrink: 0 !important;
-    margin-top: var(--spacing-md) !important;
-    height: var(--footer-height) !important;
-    min-height: var(--footer-height) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    padding: 0 !important;
-}
-
-.export-frame.export-mode .tagline {
-    padding: var(--spacing-sm) 0 0 0 !important;
-}
-
-.export-frame.export-mode .tagline h2 {
-    font-size: var(--font-size-huge) !important;
-    line-height: 1 !important;
-    margin-bottom: 0 !important;
-}
-
-.export-frame.export-mode .logo {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding-top: var(--spacing-sm) !important;
-}
-
 /* For all viewport sizes, ensure export mode ignores responsive styling */
-@media (max-width: 1024px) {
+@media (max-width: 1024px), (max-width: 768px) {
     .export-frame.export-mode {
         transform: none !important;
         margin: 0 !important;
-        padding: var(--spacing-xxl) !important;
-    }
-}
-
-@media (max-width: 768px) {
-    .export-frame.export-mode {
-        transform: none !important;
-        margin: 0 !important;
-        padding: var(--spacing-xxl) !important;
-    }
-    
-    .export-frame.export-mode h1 {
-        font-size: var(--font-size-title) !important;
-    }
-    
-    .export-frame.export-mode .tagline {
-        font-size: var(--font-size-huge) !important;
-    }
-    
-    .export-frame.export-mode .phase-name {
-        font-size: var(--font-size-md) !important;
-    }
-    
-    .export-frame.export-mode .phase-duration {
-        font-size: var(--font-size-sm) !important;
-    }
-
-    .export-frame.export-mode .credits {
-        font-size: var(--font-size-lg) !important;
-        gap: var(--spacing-md) !important;
-        justify-content: center !important;
-        display: flex !important;
-        width: 100% !important;
-    }
-    
-    .export-frame.export-mode .signature {
-        height: 48px !important;
+        padding: var(--export-padding) !important;
+        width: var(--export-width) !important;
+        height: var(--export-height) !important;
     }
 }
 

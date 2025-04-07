@@ -429,105 +429,18 @@ async function exportImage() {
             scale: 2, // Higher quality
             useCORS: true,
             backgroundColor: null, // Preserve transparency
-            logging: true, // Enable logging for debugging
+            logging: false, // Disable logging for production
             onclone: (clonedDoc) => {
-                // Apply export mode styles to the cloned document
+                // Apply export mode class to the cloned document
                 const clonedExportFrame = clonedDoc.getElementById('exportFrame');
                 if (clonedExportFrame) {
-                    // Add export mode class to ensure proper styling
                     clonedExportFrame.classList.add('export-mode');
                     
-                    // Create a minimal style element with only dynamic values
-                    const styleOverride = clonedDoc.createElement('style');
-                    styleOverride.textContent = `
-                        /* Dynamic sizing for export */
-                        .export-frame.export-mode {
-                            width: ${EXPORT_WIDTH}px !important;
-                            height: ${EXPORT_HEIGHT}px !important;
-                            padding: ${EXPORT_PADDING}px !important;
-                        }
-                        
-                        /* Fixed header/footer heights */
-                        .export-frame.export-mode .export-header,
-                        .export-frame.export-mode .export-footer {
-                            height: 250px !important;
-                            min-height: 250px !important;
-                        }
-                        
-                        /* Dynamic content wrapper height calculation */
-                        .export-frame.export-mode .content-wrapper {
-                            height: calc(${EXPORT_HEIGHT}px - (2 * ${EXPORT_PADDING}px) - 500px) !important;
-                        }
-                        
-                        /* Grid column configuration based on view mode */
-                        .export-frame.export-mode .grid-view-weeks .phase-weeks,
-                        .export-frame.export-mode .phase-weeks.view-weeks {
-                            grid-template-columns: repeat(52, 1fr) !important;
-                        }
-                        
-                        .export-frame.export-mode .grid-view-months .phase-weeks,
-                        .export-frame.export-mode .phase-weeks.view-months {
-                            grid-template-columns: repeat(24, 1fr) !important;
-                        }
-                        
-                        .export-frame.export-mode .grid-view-years .phase-weeks,
-                        .export-frame.export-mode .phase-weeks.view-years {
-                            grid-template-columns: repeat(10, 1fr) !important;
-                        }
-                        
-                        /* Footer content styling - ensure desktop sizing */
-                        .export-frame.export-mode .export-footer {
-                            height: 250px !important;
-                            min-height: 250px !important;
-                            display: flex !important;
-                            flex-direction: column !important;
-                            justify-content: flex-start !important;
-                            padding: 0 !important;
-                        }
-                        
-                        .export-frame.export-mode .tagline {
-                            padding: ${window.getComputedStyle(document.documentElement).getPropertyValue('--spacing-sm')} 0 !important;
-                        }
-                        
-                        .export-frame.export-mode .tagline h2 {
-                            font-size: ${window.getComputedStyle(document.documentElement).getPropertyValue('--font-size-huge')} !important;
-                            line-height: 1 !important;
-                            margin-bottom: 0 !important;
-                            text-align: center !important;
-                            color: var(--surface) !important;
-                        }
-                        
-                        .export-frame.export-mode .credits {
-                            gap: ${window.getComputedStyle(document.documentElement).getPropertyValue('--spacing-md')} !important;
-                            justify-content: center !important;
-                            align-items: center !important;
-                            width: 100% !important;
-                            display: flex !important;
-                            padding: 0 ${window.getComputedStyle(document.documentElement).getPropertyValue('--spacing-md')} !important;
-                        }
-                        
-                        .export-frame.export-mode .credits span {
-                            padding-top: ${window.getComputedStyle(document.documentElement).getPropertyValue('--spacing-sm')} !important;
-                            color: #FFD8A2 !important;
-                            font-size: ${window.getComputedStyle(document.documentElement).getPropertyValue('--font-size-xl')} !important;
-                            font-family: var(--heading-font) !important;
-                        }
-                        
-                        .export-frame.export-mode .logo {
-                            display: flex !important;
-                            align-items: center !important;
-                            justify-content: center !important;
-                            padding-top: ${window.getComputedStyle(document.documentElement).getPropertyValue('--spacing-sm')} !important;
-                        }
-                        
-                        .export-frame.export-mode .signature {
-                            height: 48px !important;
-                            width: auto !important;
-                        }
-                    `;
-                    
-                    // Add the style element to the cloned document
-                    clonedDoc.head.appendChild(styleOverride);
+                    // Update the title based on current view mode
+                    const titleElement = clonedExportFrame.querySelector('.export-header h2');
+                    if (titleElement) {
+                        titleElement.textContent = `My Life in ${currentViewMode}`;
+                    }
                 }
                 
                 // Ensure the cloned document has the same button state
