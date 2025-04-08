@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/Your-Life-In-Weeks/',
+  base: './',
   css: {
     devSourcemap: true, // Enable CSS source maps for development
   },

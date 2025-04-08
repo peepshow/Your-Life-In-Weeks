@@ -527,6 +527,10 @@ h2 {
     background-color: var(--accent-blue-hover);
 }
 
+.disclaimer {
+    font-size: var(--font-size-md);
+    color: var(--text-secondary);
+}
 /*----------------------------------------------
  * 7. GRID COMPONENTS
  *----------------------------------------------*/
